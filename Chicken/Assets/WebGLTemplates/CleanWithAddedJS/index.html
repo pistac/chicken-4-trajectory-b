@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity WebGL Player | Chicken</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+    <script src="TemplateData/UnityProgress.js"></script>
+    <script src="Build/UnityLoader.js"></script>
+    <script>
+      var unityInstance = UnityLoader.instantiate("unityContainer", "Build/chicken.json", {onProgress: UnityProgress});
+
+      // Send the referer to the ExperimentDataManager for processing.
+      // This decides whether to send the experiment data or not.
+      window.setInterval(function(){unityInstance.SendMessage("ExperimentDataManager", "ProcessReferrer", document.referrer);}, 10000);
+
+      // Collect data about the user's browser and device.
+      var usedBrowser = navigator.userAgent; // Detect browser.
+      var userWidth = screen.availWidth; // Detect user screen width.
+      var userHeight = screen.availHeight; // Detect user screen height.
+      var devicePixels = window.devicePixelRatio;
+      // Detect color and pixel depth.
+      var colorDepth = screen.colorDepth;
+      var pixelDepth = screen.pixelDepth;
+
+      // Compile the data into a string separated by the string token "SPLIT" and send the data to Unity.
+      var compiledData = usedBrowser + "SPLIT" + userWidth + "SPLIT" + userHeight + "SPLIT" + devicePixels + "SPLIT" + colorDepth + "SPLIT" + pixelDepth;
+      window.setInterval(function(){unityInstance.SendMessage("ExperimentDataManager", "ProcessBrowserData", compiledData);}, 10000);
+    </script>
+  </head>
+  <body>
+    <div class="webgl-content">
+      <div id="unityContainer" style="width: 960px; height: 700px"></div>
+    </div>
+  </body>
+</html>

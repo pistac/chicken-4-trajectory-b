@@ -1,0 +1,73 @@
+# Mturk template instructions
+Title: A virtual robotic encounter
+Description: This is a navigation simulation with robots. Do you continue straight, or do you let the robot pass? The task takes about 10 minutes.
+
+# First page (short info + consent)
+
+In this task, you will have some virtual encounters with a robot.
+We are interested to see how you and the robot navigate a space. Detailed information will be provided in the next page.
+The task will take approximately 10 minutes.
+		
+By clicking "Next" below, you agree to take part in this study.
+Data from this study will be be kept confidential and only shown in aggregate form.
+This study is conducted in accordance with the ethical guidelines of KTH Royal Institute of Technology.
+
+Device compatibility
+You will need a keyboard to complete the HIT. Please use a computer or laptop. You may also use a tablet connected to an external keyboard.
+
+# Second page (long instructions)
+
+In this task we are going to recreate a scenario that you might have lived many times in real life. Imagine that you are walking, and suddenly you realise that someone is walking on your same path, but towards you. If one of you doesn't swerve, you will crash into each other. What do you do?
+
+Here, you will see different robots walking towards you. You can press the SPACE key if and when you want to swerve.
+
+Please press the SPACE key now to familiarize yourself with the movement.
+
+The robots that you will see will sometimes be controlled by other Mechanical Turk workers, who are doing the task at the same time as you; other times the robot will be controlled by an AI (artificial intelligence). At the start of each round, a text will tell you who is controlling the robot that you are about to see. Just please bear in mind that it might take a few seconds longer to connect to another worker.
+
+In the next page, you will be able to customise your own appearance in the task (your avatar).
+
+Click next to continue
+
+# Demographics questions
+
+- What is your gender? 
+	radio button, options: 
+	- female
+	- male
+	- nonbinary
+	- prefer not to say
+- What is your age? (18+) 
+	here we could have a drop down menu with options from 18 to 99
+- What is the highest level of education you have completed? 
+	radio button, options: 
+	- Less than high school degree
+	- High school degree or equivalent (e.g., GED)
+	- Some college but no degree
+	- Bachelor degree
+	- Master degree
+	- Professional degree
+	- Doctoral degree
+- What is your country of origin? 
+	the dropdown menu with all those options is rather slow; could you put this as a free text field instead?
+- How often do you play video games? 
+	radio button, options: 
+	- never
+	- rarely
+	- sometimes
+	- often
+	- every day
+- Do you have experience with robots? 
+	radio button, options: 
+	- I have never seen a robot before
+	- I have only seen a robot in TV or other media
+	- I have interacted with a robot before
+	- I interact with robots on a regular basis
+- Have you ever seen the robots shown here before? 
+	(yes/no)
+- Do you have any comments on the task? 
+	(free text field)
+- Did you encounter any technical issues during the task? 
+	(free text field)
+
+

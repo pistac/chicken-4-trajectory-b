@@ -1,0 +1,88 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4376622314734297369
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4376622314734297371}
+  - component: {fileID: 4376622314734297368}
+  m_Layer: 0
+  m_Name: AssetSelector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4376622314734297371
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4376622314734297369}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4376622314734297368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4376622314734297369}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a78705e1530a82ff996d42dc8650a7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  testEnvironment: {fileID: 22292368175342602, guid: 55bffea31c4098799af6eb71f7fa568a,
+    type: 3}
+  basicEnvironment: {fileID: 8844936236368710166, guid: b4113a731a5badf33b653bf2d8d04382,
+    type: 3}
+  openEnvironment: {fileID: 8844936236368710166, guid: be4c94f9d721d1cce81a131ee031a330,
+    type: 3}
+  narrowEnvironment: {fileID: 1894213861544070977, guid: 4862f0b638ad1d53f9d98c9037d374a0,
+    type: 3}
+  female: {fileID: 5459514054889617084, guid: 68e1922ced4844403833973d5aa33082, type: 3}
+  male: {fileID: 961147250908298431, guid: c74f3e8a9235080ca8f3209b4eb2115a, type: 3}
+  playerBlack: {fileID: 2100000, guid: 1f59fbe2be92e0bce823787bd9de7f22, type: 2}
+  playerBrown: {fileID: 2100000, guid: a22cada36b50778469b53c697a3fbe08, type: 2}
+  playerLightYellow: {fileID: 2100000, guid: 7a4e505c63b0048a4805c89ec162303d, type: 2}
+  playerPink: {fileID: 2100000, guid: e5ac9747adb46aa3e8e014b6eda5423f, type: 2}
+  PR2: {fileID: 2877380398440735335, guid: 9426ad00aef73fcd380bd5f729dae43b, type: 3}
+  sophia: {fileID: 8576802619012655157, guid: c05433179277e5d81842ccfbb6d477cf, type: 3}
+  pepper: {fileID: 880231649146309801, guid: 0c1a7045755887040a5f1dfd25aede23, type: 3}
+  robotBlue: {fileID: 2100000, guid: 6f3b550243ac0012fbb4a9ed4c2df49e, type: 2}
+  robotRed: {fileID: 2100000, guid: fc6b77ce2ecc3fe02b6b679ee663b24d, type: 2}
+  robotPurple: {fileID: 2100000, guid: 197ec80e6a395439f8564b91c3f8c721, type: 2}
+  robotYellow: {fileID: 2100000, guid: 2cab77e47a5fe5997af892882b978c34, type: 2}
+  robotPink: {fileID: 2100000, guid: b9e35eccf70891552981daed35e6f08d, type: 2}
+  robotGreen: {fileID: 2100000, guid: 8bb0917fa71c17fb9a1aa89752f0be36, type: 2}
+  robotBrown: {fileID: 2100000, guid: 327022af4b744a9acb99707154efc606, type: 2}
+  robotOrange: {fileID: 2100000, guid: 578abca5d3c9b6a318153d847fbe39fb, type: 2}
+  robotBlack: {fileID: 2100000, guid: 79d1563cefe7a8c15b88e8efce9ec804, type: 2}
+  robotSpecial: {fileID: 2100000, guid: 906868e9bbe48ded48b864774e7fa0b3, type: 2}
+  sophiaBlue: {fileID: 2100000, guid: b7320dae38c51965cacb37877b01770c, type: 2}
+  sophiaRed: {fileID: 2100000, guid: 23084122adddcc0558bb47bfe94b6735, type: 2}
+  sophiaPurple: {fileID: 2100000, guid: 6022ecd7a3cfa2a6e8ca9f33b539fbb6, type: 2}
+  sophiaYellow: {fileID: 2100000, guid: db7c6db080534f806844072f1ab00ce2, type: 2}
+  sophiaPink: {fileID: 2100000, guid: fe520f5ed2f9f99238e3a302898b90ee, type: 2}
+  sophiaGreen: {fileID: 2100000, guid: a8a3abf0b3b6c9dba94119347ac9952c, type: 2}
+  sophiaBrown: {fileID: 2100000, guid: 37482e1a6369fed8da7f4cf5439cb7cf, type: 2}
+  sophiaOrange: {fileID: 2100000, guid: d8f9db2a6e6dd252981cc56a685495e2, type: 2}
+  sophiaBlack: {fileID: 2100000, guid: a03507b9bf4e9ca8e83a549ae41cc38e, type: 2}
+  sophiaSpecial: {fileID: 2100000, guid: 2bada9495e05af751aad2641b532ed01, type: 2}
+  pepperBlue: {fileID: 0}
+  pepperRed: {fileID: 2100000, guid: c0138e1f7cb61764d88456fe5dfa59d7, type: 2}
+  pepperPurple: {fileID: 2100000, guid: 75bb0f56939bed04fadff89b690095cb, type: 2}
+  pepperYellow: {fileID: 0}
+  pepperGreen: {fileID: 0}
+  pepperWhite: {fileID: 2100000, guid: 80d298776d7f66345bccc48e626ee8d9, type: 2}

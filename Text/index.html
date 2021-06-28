@@ -1,0 +1,2214 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+		<title>Audio-video dimensional emotion recognition</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<script src="https://assets.crowd.aws/crowd-html-elements.js"></script>
+</head>
+
+<style>
+
+  /*main palette*/
+  /*http://colorschemedesigner.com/csd-3.5/#3A12cHHkmkSpU */
+  :root {
+      --main-color: rgb(5, 54, 106);
+      --light-color: rgb(40, 102, 166);
+      --dark-color: rgb(18, 52, 88);
+  }
+
+  .content {
+  	max-width: 960px;
+  	margin: auto;
+  }
+
+  .mrad {
+    position: relative;
+    left: -9999px;
+    padding: 0px;
+    margin: 0px;
+	/* problematic for Firefox 56.0.2 and EDGE*/
+  }
+
+
+  .mrad img {
+    border-radius: 5px;
+    position: relative;
+    left: 9999px;
+    width: 64px;
+    opacity: 1;
+	/* not a problem*/
+  }
+ 
+
+  .mrad img:hover {
+    background-color: #eee;
+	/* not a problem*/
+  }
+ 
+
+  .mrad[aria-checked='true'] img {
+    background-color: #ccc;
+	/* not a problem*/
+  }
+  
+  .image {
+	width: 400px;
+	position: relative;
+	align-items: center;
+	display: block;
+	margin-left: auto;
+	margin-right: auto
+  }
+
+
+
+
+  #radioLabel {
+    margin: 0px;
+  }
+  
+  #ready, #practiceP {
+	text-align: center;  
+  }
+  
+  
+  .videoContainer {
+  	position: relative;
+  	overflow: hidden;
+    margin: 0 auto;
+  }
+
+  .videoContainer video {
+  	min-width: 100%;
+  	min-height: 100%;
+  }
+  
+  .sam {	  
+  	position: relative;
+	align-items: center;
+  	overflow: hidden;
+    margin: 0 auto;
+	width: 600px;
+	  
+  }
+  
+  #practiceTrial {
+	position: relative;
+	align-items: center;
+  	overflow: hidden;
+    margin: 0 auto;
+	width: 600px;
+	  
+  }
+
+  #consentButton, #goToPractice, #goToHeadphones, #headphonesButton, #goToBG, #goToTrial1,
+  #goToTrial2,#goToTrial3,#goToTrial4,#goToTrial5,#goToTrial6,#goToTrial7,#goToTrial8,#goToTrial9,#goToTrial10,#goToTrial11,#goToTrial12,#goToTrial13,#goToTrial14,#goToTrial15,#goToTrial16,#goToTrial17,#goToTrial18,#goToTrial19,#goToTrial20,#goToTrial21,#goToTrial22,#goToTrial23,#goToTrial24,#goToTrial25,#goToTrial26,#goToTrial27,#goToTrial28  {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  #submitButton {
+    position: absolute;
+    left: 50%;
+    margin-left: -50px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
+  
+  button:disabled {
+	border: 1px solid #999999;
+	background-color: #cccccc;
+	color: #666666;
+  }
+
+
+
+  /*button
+  @keyframes pulse {
+    0% {
+      transform: scale(0);
+      opacity: 0;
+    }
+    33% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(3);
+      opacity: 0;
+    }
+  }
+  */
+
+  .button {
+    display: inline-flex;
+    align-items: center;
+    background: var(--light-color);/*#C06C84;*/
+    box-shadow: 0 3px 2px 0 rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    height: 45px;
+    padding: 0 30px;
+    color: white;
+    font-family: Lato, Arial, sans-serif;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background .3s, transform .3s, box-shadow .3s;
+    will-change: transform;
+  }
+  .button:hover:enabled {
+    background: var(--main-color);/* #ae4b67;*/
+    box-shadow: 0 4px 17px rgba(0, 0, 0, 0.2);
+    transform: translate3d(0, -2px, 0);
+  }
+  .button:active {
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1);
+    transform: translate3d(0, 1px, 0);
+  }
+
+  .pulse {
+    position: relative;
+  }
+  .pulse:before, .pulse:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    opacity: 0;
+    margin: auto;
+  }
+  .pulse:before {
+    animation: pulse 1.5s infinite linear;
+  }
+  .pulse:after {
+    animation: pulse 2s .4s infinite linear;
+  }
+  .pulse:hover:before, .pulse:hover:after {
+    display: none;
+  }
+
+  /** toggle button**/
+
+  /*
+  =====
+  LEVEL 1. CORE STYLES
+  =====
+  */
+
+  .toggle{
+    --uiToggleSize: var(--toggleSize, 20px);
+    --uiToggleIndent: var(--toggleIndent, .4em);
+    --uiToggleBorderWidth: var(--toggleBorderWidth, 2px);
+    --uiToggleColor: var(--toggleColor, #000);
+    --uiToggleDisabledColor: var(--toggleDisabledColor, #868e96);
+    --uiToggleBgColor: var(--toggleBgColor, #fff);
+    --uiToggleArrowWidth: var(--toggleArrowWidth, 2px);
+    --uiToggleArrowColor: var(--toggleArrowColor, #fff);
+
+    display: inline-block;
+    position: relative;
+  }
+
+  .toggle__input{
+    position: absolute;
+    left: -99999px;
+  }
+
+  .toggle__label{
+    display: inline-flex;
+    min-height: var(--uiToggleSize);
+    padding-left: calc(var(--uiToggleSize) + var(--uiToggleIndent));
+  }
+
+  .toggle__input:not(:disabled) ~ .toggle__label{
+    cursor: pointer;
+  }
+
+  .toggle__label::before,
+  .toggle__label::after{
+    content: "";
+    box-sizing: border-box;
+    width: 1em;
+    height: 1em;
+    font-size: var(--uiToggleSize);
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+
+  .toggle__label:before{
+    border: var(--uiToggleBorderWidth) solid var(--uiToggleColor);
+    z-index: 2;
+  }
+
+  .toggle__input:disabled ~ .toggle__label::before{
+    border-color: var(--uiToggleDisabledColor);
+  }
+
+  .toggle__input:focus ~ .toggle__label::before{
+    box-shadow: 0 0 0 2px var(--uiToggleBgColor), 0 0 0px 4px var(--uiToggleColor);
+  }
+
+  .toggle__input:not(:disabled):checked:focus ~ .toggle__label::after{
+    box-shadow: 0 0 0 2px var(--uiToggleBgColor), 0 0 0px 4px var(--uiToggleColor);
+  }
+
+  .toggle__input:not(:disabled) ~ .toggle__label::after{
+    background-color: var(--uiToggleColor);
+    opacity: 0;
+  }
+
+  .toggle__input:not(:disabled):checked ~ .toggle__label::after{
+    opacity: 1;
+  }
+
+  .toggle__text{
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+
+  /*
+  The arrow size and position depends from sizes of square because I needed an arrow correct positioning from the top left corner of the element toggle
+  */
+
+  .toggle__text::before{
+    content: "";
+    box-sizing: border-box;
+    width: 0;
+    height: 0;
+    font-size: var(--uiToggleSize);
+
+    border-left-width: 0;
+    border-bottom-width: 0;
+    border-left-style: solid;
+    border-bottom-style: solid;
+    border-color: var(--uiToggleArrowColor);
+
+    position: absolute;
+    top: .5428em;
+    left: .2em;
+    z-index: 3;
+
+    transform-origin: left top;
+    transform: rotate(-40deg) skew(10deg);
+  }
+
+  .toggle__input:not(:disabled):checked ~ .toggle__label .toggle__text::before{
+    width: .5em;
+    height: .25em;
+    border-left-width: var(--uiToggleArrowWidth);
+    border-bottom-width: var(--uiToggleArrowWidth);
+    will-change: width, height;
+    transition: width .1s ease-out .2s, height .2s ease-out;
+  }
+
+  /*
+  =====
+  LEVEL 2. PRESENTATION STYLES
+  =====
+  */
+
+  /*
+  The demo skin
+  */
+
+  .toggle__input:disabled ~ .toggle__label{
+    opacity: .24;
+    cursor: not-allowed;
+  }
+
+  .toggle__label::before,
+  .toggle__label::after{
+    border-radius: 2px;
+  }
+
+  /*
+  The animation of switching states
+  */
+
+  .toggle__input:not(:disabled) ~ .toggle__label::before,
+  .toggle__input:not(:disabled) ~ .toggle__label::after{
+    opacity: 1;
+    transform-origin: center center;
+    will-change: transform;
+    transition: transform .2s ease-out;
+  }
+
+  .toggle__input:not(:disabled) ~ .toggle__label::before{
+    transform: rotateY(0deg);
+    transition-delay: .2s;
+  }
+
+  .toggle__input:not(:disabled) ~ .toggle__label::after{
+    transform: rotateY(90deg);
+  }
+
+  .toggle__input:not(:disabled):checked ~ .toggle__label::before{
+    transform: rotateY(-90deg);
+    transition-delay: 0s;
+  }
+
+  .toggle__input:not(:disabled):checked ~ .toggle__label::after{
+    transform: rotateY(0deg);
+    transition-delay: .2s;
+  }
+
+  .toggle__text::before{
+    opacity: 0;
+  }
+
+  .toggle__input:not(:disabled):checked ~ .toggle__label .toggle__text::before{
+    opacity: 1;
+    transition: opacity .1s ease-out .3s, width .1s ease-out .5s, height .2s ease-out .3s;
+  }
+
+  /*
+  =====
+  LEVEL 3. SETTINGS
+  =====
+  */
+
+  .toggle {
+    --toggleColor: var(--light-color);
+    --toggleBgColor: white;
+    --toggleSize: 30px;
+  }
+
+
+  /*INPUT FIELD*/
+  :root {
+    --input-color: #99A3BA;
+    --input-border: #CDD9ED;
+    --input-background: #fff;
+    --input-placeholder: #CBD1DC;
+    --input-border-focus: #275EFE;
+    --group-color: var(--input-color);
+    --group-border: var(--input-border);
+    --group-background: #EEF4FF;
+    --group-color-focus: #fff;
+    --group-border-focus: var(--input-border-focus);
+    --group-background-focus: #678EFE;
+  }
+
+  .form-field {
+    display: block;
+    width: 100%;
+    padding: 8px 16px;
+    line-height: 25px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: inherit;
+    border-radius: 6px;
+    -webkit-appearance: none;
+    color: var(--input-color);
+    border: 1px solid var(--input-border);
+    background: var(--input-background);
+    -webkit-transition: border .3s ease;
+    transition: border .3s ease;
+  }
+  .form-field::-webkit-input-placeholder {
+    color: var(--input-placeholder);
+  }
+  .form-field::-moz-placeholder {
+    color: var(--input-placeholder);
+  }
+  .form-field:-ms-input-placeholder {
+    color: var(--input-placeholder);
+  }
+  .form-field::-ms-input-placeholder {
+    color: var(--input-placeholder);
+  }
+  .form-field::placeholder {
+    color: var(--input-placeholder);
+  }
+  .form-field:focus {
+    outline: none;
+    border-color: var(--input-border-focus);
+  }
+
+  .form-group {
+    position: relative;
+    display: -webkit-box;
+    display: flex;
+    width: 100%;
+  }
+  .form-group > span,
+  .form-group .form-field {
+    white-space: nowrap;
+    display: block;
+  }
+  .form-group > span:not(:first-child):not(:last-child),
+  .form-group .form-field:not(:first-child):not(:last-child) {
+    border-radius: 0;
+  }
+  .form-group > span:first-child,
+  .form-group .form-field:first-child {
+    border-radius: 6px 0 0 6px;
+  }
+  .form-group > span:last-child,
+  .form-group .form-field:last-child {
+    border-radius: 0 6px 6px 0;
+  }
+  .form-group > span:not(:first-child),
+  .form-group .form-field:not(:first-child) {
+    margin-left: -1px;
+  }
+  .form-group .form-field {
+    position: relative;
+    z-index: 1;
+    -webkit-box-flex: 1;
+            flex: 1 1 auto;
+    width: 1%;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+  .form-group > span {
+    text-align: center;
+    padding: 8px 12px;
+    font-size: 14px;
+    line-height: 25px;
+    color: var(--group-color);
+    background: var(--group-background);
+    border: 1px solid var(--group-border);
+    -webkit-transition: background .3s ease, border .3s ease, color .3s ease;
+    transition: background .3s ease, border .3s ease, color .3s ease;
+  }
+  .form-group:focus-within > span {
+    color: var(--group-color-focus);
+    background: var(--group-background-focus);
+    border-color: var(--group-border-focus);
+  }
+
+
+  /******************************************************************************/
+  /******************************RESPONSIVE**************************************/
+
+  @media screen and (min-width: 768px) {
+    /*per schermi grandi, più di un tablet*/
+    .videoContainer {
+    	width: 70%;
+      margin: 5% auto;
+    }
+    #instructions, #headphonesButton, #backgroundQuestions  {
+      margin-left: 10%;
+      margin-right: 10%;
+      margin-top: 5%;
+    }
+  }
+
+  @media screen and (min-width: 1000px) {
+    /*per schermi molto grandi, più di un desktop*/
+    .videoContainer {
+    	width: 60%;
+      margin: 10px auto;
+    }
+  }
+
+
+</style>
+
+<body>
+	<crowd-form answer-format="flatten-objects">
+
+		<div id="instructions">
+			<h1>Instructions </h1>
+				<ul>
+					<li>You will watch several clips where an animated character is describing an object.</li>
+					<li>Please <strong>rate</strong> each clip in terms of arousal and valence.</li>
+					<li><strong>Arousal</strong> refers to whether the character is displaying high or low activation, such as excitedness or calmness.</li>
+					<li><strong>Valence</strong> refers to whether the character is displaying a positive or negative emotion, such as happiness or sadness.</li>
+					<li>To <strong>rate</strong> a clip, click on the images corresponding to how the agent in the clip is feeling.</li>
+					<li>After rating a clip, click "next" to move on to the next clip.</li>
+					<li>Some clips will have audio and video, some only audio, some only video. Please <strong>watch</strong> and <strong>listen</strong> to each clip carefully.</li>
+					<li>Please wear <strong>headphones</strong> and adjust the volume to a comfortable level.</li>
+				</ul>
+		
+			<h1>Consent</h1>
+				<ul>
+					<li>By clicking "Next" below, you agree to take part in this study.</li>
+					<li>Data from this study will be be kept confidential and only shown in aggregate form.</li>
+					<li>This study is conducted in accordance with the ethical guidelines of KTH Royal Institute of Technology.</li>
+				</ul>
+				
+			<h1>Browser compatibility</h1>
+				<p> For best results, use Chrome or Firefox. <strong> You won't be able to complete the task if you are using Internet Explorer. </strong></p>
+
+		</div>
+
+		<div id = "goToHeadphones">
+			<button class="button pulse" id="goToHeadphonesBtn">Next</button>
+		</div>
+
+
+		<div id="headphonesButton" hidden>
+			<h2>Please note that you must wear headphones to take part. </h2>
+			<h3>Please adjust the volume to a comfortable level now.</h3>
+		    <label class="toggle">
+		      <input class="toggle__input" type="checkbox" name="headphones" value="true" id="headphonesBtn" autocomplete="off">
+		      <span class="toggle__label">
+		        <span class="toggle__text">I confirm I am wearing headphones</span>
+		      </span>
+		    </label>
+		</div>
+
+		<div id = "goToPractice" hidden>
+			<br><button class="button pulse" id="Next1" disabled>Next</button>
+		</div>
+		
+		<div id="practiceTrial" hidden>
+			<h2 id="practiceP">Let's get acquainted with the task.</h2>
+			<p> First, you will see this image. Clicking on it will play a video of an animated character:</p>
+			
+			<div class="videoContainer">
+				<video style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();">
+					<source  type="video/mp4" src="https://cognovo.eu/files/project-21/practiceAndy_NA.mp4">
+					Your browser does not support HTML5 video.			
+				</video>
+			</div>
+			
+			<p> The clips will sometimes have audio, sometimes not. Sometimes they will have no video, like this one:</p>
+			
+			<div class="videoContainer">
+				<video style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();">
+					<source type="video/mp4" src="https://cognovo.eu/files/project-21/practiceSimon_NV.mp4">
+					Your browser does not support HTML5 video.			
+				</video>
+			</div>
+			
+			<p> After the clip stops playing, scroll down to see the following rating scales. Click on the image that best represents how the character in the clip is feeling, in terms of arousal and valence. The rating that you select is highlighted in grey:</p>
+			
+			<img class="image" src="https://cognovo.eu/files/project-21/example.png" alt="rating scales highlighted in grey" />
+			
+			<p> Remember, arousal refers to how excited or calm the animated character is; valence refers to whether it's displaying a positive or negative emotion. Try to focus on how the character in the clips is feeling, rather than what it is saying.</p>
+			
+			<p>You can watch the clip as many times as you need, by clicking on it.</p>
+			
+			<p>Once you are happy with the rating, click "Next" to proceed to the next clip.</p>
+			
+			<p><strong>Important!</strong> You will need to provide one rating for arousal and one for valence before moving to the next clip. </p>
+			
+			<p id="ready"> Ready? </p>
+			
+			<div id = "goToTrial1">
+				<br><button class="button pulse" id="Next2">Start experiment</button>
+				<input type = "hidden" name = "browser" value = "" id = "browser">
+				<input type="hidden" name="screen" value="" id="screen">
+				<input type="hidden" name="devicePx" value="" id="devicePx">
+				<input type="hidden" name="colour" value="" id="colour">
+				<input type="hidden" name="pixel" value="" id="pixel">
+			</div>
+		
+		</div>
+		<div id="trial1" hidden>
+			<div class="videoContainer">
+				<video id="vsrc1" style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();"> 
+					<source type="video/mp4" src="data:,">
+					Your browser does not support HTML5 video.
+				<input type = "hidden" name = "video1" value = "" id = "playedVideo1">
+				</video>
+			</div>
+
+			<div id="samQuestions1" class="sam" hidden>
+				<h2>Please select how the character in the video is feeling.</h2>
+
+				<div>
+					<h3> Arousal </h3> 
+					<h4> From very calm to very agitated </h4>
+					
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="arousal1_t1" name="arousal1_t1" value="1"><img src="https://cognovo.eu/files/project-21/arousal1.png" alt="stylized image of a very calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal2_t1" name="arousal2_t1" value="2"><img src="https://cognovo.eu/files/project-21/arousal2.png" alt="stylized image of a calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal3_t1" name="arousal3_t1" value="3"><img src="https://cognovo.eu/files/project-21/arousal3.png" alt="stylized image of a neither calm nor agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal4_t1" name="arousal4_t1" value="4"><img src="https://cognovo.eu/files/project-21/arousal4.png" alt="stylized image of an agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal5_t1" name="arousal5_t1" value="5"><img src="https://cognovo.eu/files/project-21/arousal5.png" alt="stylized image of a very agitated person" /></crowd-radio-button>
+				</crowd-radio-group>
+
+				<h3> Valence </h3> 
+				<h4> From very sad to very happy </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="valence1_t1" name="valence1_t1" value="1"><img src="https://cognovo.eu/files/project-21/valence1.png" alt="stylized image of a very sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence2_t1" name="valence2_t1" value="2"><img src="https://cognovo.eu/files/project-21/valence2.png" alt="stylized image of a sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence3_t1" name="valence3_t1" value="3"><img src="https://cognovo.eu/files/project-21/valence3.png" alt="stylized image of a neither sad nor happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence4_t1" name="valence4_t1" value="4"><img src="https://cognovo.eu/files/project-21/valence4.png" alt="stylized image of a happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence5_t1" name="valence5_t1" value="5"><img src="https://cognovo.eu/files/project-21/valence5.png" alt="stylized image of a very happy person" /></crowd-radio-button>
+				</crowd-radio-group>
+				
+				<div id = "goToTrial2">
+					<br><button id="goToTrial2Btn" class="button pulse" disabled autocomplete="off">Next</button>
+					<input type = "hidden" name = "ReacTime_t1" value = "0" id = "RT_t1">
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<div id="trial2" hidden>
+			<div class="videoContainer">
+				<video id="vsrc2" style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();"> 
+					<source type="video/mp4" src="data:,">
+					Your browser does not support HTML5 video.
+				<input type = "hidden" name = "video2" value = "" id = "playedVideo2">
+				</video>
+			</div>
+
+			<div id="samQuestions2" class="sam" hidden>
+				<h2>Please select how the character in the video is feeling.</h2>
+
+				<div>
+
+				<h3> Arousal </h3> 
+				<h4> From very calm to very agitated </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="arousal1_t2" name="arousal1_t2" value="1"><img src="https://cognovo.eu/files/project-21/arousal1.png" alt="stylized image of a very calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal2_t2" name="arousal2_t2" value="2"><img src="https://cognovo.eu/files/project-21/arousal2.png" alt="stylized image of a calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal3_t2" name="arousal3_t2" value="3"><img src="https://cognovo.eu/files/project-21/arousal3.png" alt="stylized image of a neither calm nor agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal4_t2" name="arousal4_t2" value="4"><img src="https://cognovo.eu/files/project-21/arousal4.png" alt="stylized image of an agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal5_t2" name="arousal5_t2" value="5"><img src="https://cognovo.eu/files/project-21/arousal5.png" alt="stylized image of a very agitated person" /></crowd-radio-button>
+				</crowd-radio-group>
+
+				<h3> Valence </h3> 
+				<h4> From very sad to very happy </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="valence1_t2" name="valence1_t2" value="1"><img src="https://cognovo.eu/files/project-21/valence1.png" alt="stylized image of a very sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence2_t2" name="valence2_t2" value="2"><img src="https://cognovo.eu/files/project-21/valence2.png" alt="stylized image of a sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence3_t2" name="valence3_t2" value="3"><img src="https://cognovo.eu/files/project-21/valence3.png" alt="stylized image of a neither sad nor happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence4_t2" name="valence4_t2" value="4"><img src="https://cognovo.eu/files/project-21/valence4.png" alt="stylized image of a happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence5_t2" name="valence5_t2" value="5"><img src="https://cognovo.eu/files/project-21/valence5.png" alt="stylized image of a very happy person" /></crowd-radio-button>
+				</crowd-radio-group>
+				<div id = "goToTrial3">
+					<br><button id="goToTrial3Btn" class="button pulse" disabled autocomplete="off">Next</button>
+					<input type = "hidden" name = "ReacTime_t2" value = "0" id = "RT_t2">
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<div id="trial3" hidden>
+			<div class="videoContainer">
+				<video id="vsrc3" style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();"> 
+					<source type="video/mp4" src="data:,">
+					Your browser does not support HTML5 video.
+				<input type = "hidden" name = "video3" value = "" id = "playedVideo3">
+				</video>
+			</div>
+
+			<div id="samQuestions3" class="sam" hidden>
+				<h2>Please select how the character in the video is feeling.</h2>
+
+				<div>
+				<h3> Arousal </h3> 
+				<h4> From very calm to very agitated </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="arousal1_t3" name="arousal1_t3" value="1"><img src="https://cognovo.eu/files/project-21/arousal1.png" alt="stylized image of a very calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal2_t3" name="arousal2_t3" value="2"><img src="https://cognovo.eu/files/project-21/arousal2.png" alt="stylized image of a calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal3_t3" name="arousal3_t3" value="3"><img src="https://cognovo.eu/files/project-21/arousal3.png" alt="stylized image of a neither calm nor agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal4_t3" name="arousal4_t3" value="4"><img src="https://cognovo.eu/files/project-21/arousal4.png" alt="stylized image of an agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal5_t3" name="arousal5_t3" value="5"><img src="https://cognovo.eu/files/project-21/arousal5.png" alt="stylized image of a very agitated person" /></crowd-radio-button>
+				</crowd-radio-group>
+
+				<h3> Valence </h3> 
+				<h4> From very sad to very happy </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="valence1_t3" name="valence1_t3" value="1"><img src="https://cognovo.eu/files/project-21/valence1.png" alt="stylized image of a very sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence2_t3" name="valence2_t3" value="2"><img src="https://cognovo.eu/files/project-21/valence2.png" alt="stylized image of a sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence3_t3" name="valence3_t3" value="3"><img src="https://cognovo.eu/files/project-21/valence3.png" alt="stylized image of a neither sad nor happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence4_t3" name="valence4_t3" value="4"><img src="https://cognovo.eu/files/project-21/valence4.png" alt="stylized image of a happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence5_t3" name="valence5_t3" value="5"><img src="https://cognovo.eu/files/project-21/valence5.png" alt="stylized image of a very happy person" /></crowd-radio-button>
+				</crowd-radio-group>
+				<div id = "goToTrial4">
+					<br><button id="goToTrial4Btn" class="button pulse" disabled autocomplete="off">Next</button>
+					<input type = "hidden" name = "ReacTime_t3" value = "0" id = "RT_t3">
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<div id="trial4" hidden>
+			<div class="videoContainer">
+				<video id="vsrc4" style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();">
+					<source type="video/mp4" src="data:,">
+					Your browser does not support HTML5 video.
+				<input type = "hidden" name = "video4" value = "" id = "playedVideo4">
+				</video>
+			</div>
+
+			<div id="samQuestions4" class="sam" hidden>
+				<h2>Please select how the character in the video is feeling.</h2>
+
+				<div>
+
+				<h3> Arousal </h3> 
+				<h4> From very calm to very agitated </h4>
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="arousal1_t4" name="arousal1_t4" value="1"><img src="https://cognovo.eu/files/project-21/arousal1.png" alt="stylized image of a very calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal2_t4" name="arousal2_t4" value="2"><img src="https://cognovo.eu/files/project-21/arousal2.png" alt="stylized image of a calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal3_t4" name="arousal3_t4" value="3"><img src="https://cognovo.eu/files/project-21/arousal3.png" alt="stylized image of a neither calm nor agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal4_t4" name="arousal4_t4" value="4"><img src="https://cognovo.eu/files/project-21/arousal4.png" alt="stylized image of an agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal5_t4" name="arousal5_t4" value="5"><img src="https://cognovo.eu/files/project-21/arousal5.png" alt="stylized image of a very agitated person" /></crowd-radio-button>
+				</crowd-radio-group>
+
+				<h3> Valence </h3> 
+				<h4> From very sad to very happy </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="valence1_t4" name="valence1_t4" value="1"><img src="https://cognovo.eu/files/project-21/valence1.png" alt="stylized image of a very sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence2_t4" name="valence2_t4" value="2"><img src="https://cognovo.eu/files/project-21/valence2.png" alt="stylized image of a sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence3_t4" name="valence3_t4" value="3"><img src="https://cognovo.eu/files/project-21/valence3.png" alt="stylized image of a neither sad nor happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence4_t4" name="valence4_t4" value="4"><img src="https://cognovo.eu/files/project-21/valence4.png" alt="stylized image of a happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence5_t4" name="valence5_t4" value="5"><img src="https://cognovo.eu/files/project-21/valence5.png" alt="stylized image of a very happy person" /></crowd-radio-button>
+				</crowd-radio-group>
+				<div id = "goToTrial5">
+					<br><button id="goToTrial5Btn" class="button pulse" disabled autocomplete="off">Next</button>
+					<input type = "hidden" name = "ReacTime_t4" value = "0" id = "RT_t4">
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<div id="trial5" hidden>
+			<div class="videoContainer">
+				<video  id="vsrc5" style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();"> 
+					<source type="video/mp4" src="data:,">
+					Your browser does not support HTML5 video.
+				<input type = "hidden" name = "video5" value = "" id = "playedVideo5">
+				</video>
+			</div>
+
+			<div id="samQuestions5" class="sam" hidden>
+				<h2> Please select how the character in the video is feeling. </h2>
+
+				<div >
+				
+				<h3> Arousal </h3> 
+				<h4> From very calm to very agitated </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="arousal1_t5" name="arousal1_t5" value="1"><img src="https://cognovo.eu/files/project-21/arousal1.png" alt="stylized image of a very calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal2_t5" name="arousal2_t5" value="2"><img src="https://cognovo.eu/files/project-21/arousal2.png" alt="stylized image of a calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal3_t5" name="arousal3_t5" value="3"><img src="https://cognovo.eu/files/project-21/arousal3.png" alt="stylized image of a neither calm nor agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal4_t5" name="arousal4_t5" value="4"><img src="https://cognovo.eu/files/project-21/arousal4.png" alt="stylized image of an agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal5_t5" name="arousal5_t5" value="5"><img src="https://cognovo.eu/files/project-21/arousal5.png" alt="stylized image of a very agitated person" /></crowd-radio-button>
+				</crowd-radio-group>
+
+				
+				<h3> Valence </h3> 
+				<h4> From very sad to very happy </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="valence1_t5" name="valence1_t5" value="1"><img src="https://cognovo.eu/files/project-21/valence1.png" alt="stylized image of a very sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence2_t5" name="valence2_t5" value="2"><img src="https://cognovo.eu/files/project-21/valence2.png" alt="stylized image of a sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence3_t5" name="valence3_t5" value="3"><img src="https://cognovo.eu/files/project-21/valence3.png" alt="stylized image of a neither sad nor happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence4_t5" name="valence4_t5" value="4"><img src="https://cognovo.eu/files/project-21/valence4.png" alt="stylized image of a happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence5_t5" name="valence5_t5" value="5"><img src="https://cognovo.eu/files/project-21/valence5.png" alt="stylized image of a very happy person" /></crowd-radio-button>
+				</crowd-radio-group>
+				<div id = "goToTrial6">
+					<br><button id="goToTrial6Btn" class="button pulse" disabled autocomplete="off">Next</button>
+					<input type = "hidden" name = "ReacTime_t5" value = "0" id = "RT_t5">
+				</div>
+			</div>
+		</div>
+		</div>
+		
+		<div id="trial6" hidden>
+			<div class="videoContainer">
+				<video  id="vsrc6" style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();"> 
+					<source type="video/mp4" src="data:,">
+					Your browser does not support HTML5 video.
+				<input type = "hidden" name = "video6" value = "" id = "playedVideo6">
+				</video>
+			</div>
+
+			<div id="samQuestions6" class="sam" hidden>
+				<h2>Please select how the character in the video is feeling.</h2>
+
+				<div >
+
+				
+				<h3> Arousal </h3> 
+				<h4> From very calm to very agitated </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="arousal1_t6" name="arousal1_t6" value="1"><img src="https://cognovo.eu/files/project-21/arousal1.png" alt="stylized image of a very calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal2_t6" name="arousal2_t6" value="2"><img src="https://cognovo.eu/files/project-21/arousal2.png" alt="stylized image of a calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal3_t6" name="arousal3_t6" value="3"><img src="https://cognovo.eu/files/project-21/arousal3.png" alt="stylized image of a neither calm nor agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal4_t6" name="arousal4_t6" value="4"><img src="https://cognovo.eu/files/project-21/arousal4.png" alt="stylized image of an agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal5_t6" name="arousal5_t6" value="5"><img src="https://cognovo.eu/files/project-21/arousal5.png" alt="stylized image of a very agitated person" /></crowd-radio-button>
+				</crowd-radio-group>
+
+				
+				<h3> Valence </h3> 
+				<h4> From very sad to very happy </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="valence1_t6" name="valence1_t6" value="1"><img src="https://cognovo.eu/files/project-21/valence1.png" alt="stylized image of a very sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence2_t6" name="valence2_t6" value="2"><img src="https://cognovo.eu/files/project-21/valence2.png" alt="stylized image of a sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence3_t6" name="valence3_t6" value="3"><img src="https://cognovo.eu/files/project-21/valence3.png" alt="stylized image of a neither sad nor happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence4_t6" name="valence4_t6" value="4"><img src="https://cognovo.eu/files/project-21/valence4.png" alt="stylized image of a happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence5_t6" name="valence5_t6" value="5"><img src="https://cognovo.eu/files/project-21/valence5.png" alt="stylized image of a very happy person" /></crowd-radio-button>
+				</crowd-radio-group>
+				<div id = "goToTrial7">
+					<br><button id="goToTrial7Btn" class="button pulse" disabled autocomplete="off">Next</button>
+					<input type = "hidden" name = "ReacTime_t6" value = "0" id = "RT_t6">
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<div id="trial7" hidden>
+			<div class="videoContainer">
+				<video  id="vsrc7" style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();"> 
+					<source type="video/mp4" src="data:,">
+					Your browser does not support HTML5 video.
+				<input type = "hidden" name = "video7" value = "" id = "playedVideo7">
+				</video>
+			</div>
+
+			<div id="samQuestions7" class="sam" hidden>
+				<h2>Please select how the character in the video is feeling.</h2>
+
+				<div >
+
+				
+				<h3> Arousal </h3> 
+				<h4> From very calm to very agitated </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="arousal1_t7" name="arousal1_t7" value="1"><img src="https://cognovo.eu/files/project-21/arousal1.png" alt="stylized image of a very calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal2_t7" name="arousal2_t7" value="2"><img src="https://cognovo.eu/files/project-21/arousal2.png" alt="stylized image of a calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal3_t7" name="arousal3_t7" value="3"><img src="https://cognovo.eu/files/project-21/arousal3.png" alt="stylized image of a neither calm nor agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal4_t7" name="arousal4_t7" value="4"><img src="https://cognovo.eu/files/project-21/arousal4.png" alt="stylized image of an agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal5_t7" name="arousal5_t7" value="5"><img src="https://cognovo.eu/files/project-21/arousal5.png" alt="stylized image of a very agitated person" /></crowd-radio-button>
+				</crowd-radio-group>
+
+				
+				<h3> Valence </h3> 
+				<h4> From very sad to very happy </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="valence1_t7" name="valence1_t7" value="1"><img src="https://cognovo.eu/files/project-21/valence1.png" alt="stylized image of a very sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence2_t7" name="valence2_t7" value="2"><img src="https://cognovo.eu/files/project-21/valence2.png" alt="stylized image of a sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence3_t7" name="valence3_t7" value="3"><img src="https://cognovo.eu/files/project-21/valence3.png" alt="stylized image of a neither sad nor happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence4_t7" name="valence4_t7" value="4"><img src="https://cognovo.eu/files/project-21/valence4.png" alt="stylized image of a happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence5_t7" name="valence5_t7" value="5"><img src="https://cognovo.eu/files/project-21/valence5.png" alt="stylized image of a very happy person" /></crowd-radio-button>
+				</crowd-radio-group>
+				<div id = "goToTrial8">
+					<br><button id="goToTrial8Btn" class="button pulse" disabled autocomplete="off">Next</button>
+					<input type = "hidden" name = "ReacTime_t7" value = "0" id = "RT_t7">
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<div id="trial8" hidden>
+			<div class="videoContainer">
+				<video  id="vsrc8" style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();"> 
+					<source type="video/mp4" src="data:,">
+					Your browser does not support HTML5 video.
+				<input type = "hidden" name = "video8" value = "" id = "playedVideo8">
+				</video>
+			</div>
+
+			<div id="samQuestions8" class="sam" hidden>
+				<h2>Please select how the character in the video is feeling.</h2>
+
+				<div >
+
+				
+				<h3> Arousal </h3> 
+				<h4> From very calm to very agitated </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="arousal1_t8" name="arousal1_t8" value="1"><img src="https://cognovo.eu/files/project-21/arousal1.png" alt="stylized image of a very calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal2_t8" name="arousal2_t8" value="2"><img src="https://cognovo.eu/files/project-21/arousal2.png" alt="stylized image of a calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal3_t8" name="arousal3_t8" value="3"><img src="https://cognovo.eu/files/project-21/arousal3.png" alt="stylized image of a neither calm nor agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal4_t8" name="arousal4_t8" value="4"><img src="https://cognovo.eu/files/project-21/arousal4.png" alt="stylized image of an agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal5_t8" name="arousal5_t8" value="5"><img src="https://cognovo.eu/files/project-21/arousal5.png" alt="stylized image of a very agitated person" /></crowd-radio-button>
+				</crowd-radio-group>
+
+				
+				<h3> Valence </h3> 
+				<h4> From very sad to very happy </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="valence1_t8" name="valence1_t8" value="1"><img src="https://cognovo.eu/files/project-21/valence1.png" alt="stylized image of a very sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence2_t8" name="valence2_t8" value="2"><img src="https://cognovo.eu/files/project-21/valence2.png" alt="stylized image of a sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence3_t8" name="valence3_t8" value="3"><img src="https://cognovo.eu/files/project-21/valence3.png" alt="stylized image of a neither sad nor happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence4_t8" name="valence4_t8" value="4"><img src="https://cognovo.eu/files/project-21/valence4.png" alt="stylized image of a happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence5_t8" name="valence5_t8" value="5"><img src="https://cognovo.eu/files/project-21/valence5.png" alt="stylized image of a very happy person" /></crowd-radio-button>
+				</crowd-radio-group>
+				<div id = "goToTrial9">
+					<br><button id="goToTrial9Btn" class="button pulse" disabled autocomplete="off">Next</button>
+					<input type = "hidden" name = "ReacTime_t8" value = "0" id = "RT_t8">
+				</div>
+			</div>
+		</div>
+		</div>
+		
+		<div id="trial9" hidden>
+			<div class="videoContainer">
+				<video  id="vsrc9" style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();"> 
+					<source type="video/mp4" src="data:,">
+					Your browser does not support HTML5 video.
+				<input type = "hidden" name = "video9" value = "" id = "playedVideo9">
+				</video>
+			</div>
+
+			<div id="samQuestions9" class="sam" hidden>
+				<h2>Please select how the character in the video is feeling.</h2>
+
+				<div >
+
+				
+				<h3> Arousal </h3> 
+				<h4> From very calm to very agitated </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="arousal1_t9" name="arousal1_t9" value="1"><img src="https://cognovo.eu/files/project-21/arousal1.png" alt="stylized image of a very calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal2_t9" name="arousal2_t9" value="2"><img src="https://cognovo.eu/files/project-21/arousal2.png" alt="stylized image of a calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal3_t9" name="arousal3_t9" value="3"><img src="https://cognovo.eu/files/project-21/arousal3.png" alt="stylized image of a neither calm nor agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal4_t9" name="arousal4_t9" value="4"><img src="https://cognovo.eu/files/project-21/arousal4.png" alt="stylized image of an agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal5_t9" name="arousal5_t9" value="5"><img src="https://cognovo.eu/files/project-21/arousal5.png" alt="stylized image of a very agitated person" /></crowd-radio-button>
+				</crowd-radio-group>
+
+				
+				<h3> Valence </h3> 
+				<h4> From very sad to very happy </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="valence1_t9" name="valence1_t9" value="1"><img src="https://cognovo.eu/files/project-21/valence1.png" alt="stylized image of a very sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence2_t9" name="valence2_t9" value="2"><img src="https://cognovo.eu/files/project-21/valence2.png" alt="stylized image of a sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence3_t9" name="valence3_t9" value="3"><img src="https://cognovo.eu/files/project-21/valence3.png" alt="stylized image of a neither sad nor happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence4_t9" name="valence4_t9" value="4"><img src="https://cognovo.eu/files/project-21/valence4.png" alt="stylized image of a happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence5_t9" name="valence5_t9" value="5"><img src="https://cognovo.eu/files/project-21/valence5.png" alt="stylized image of a very happy person" /></crowd-radio-button>
+				</crowd-radio-group>
+				<div id = "goToTrial10">
+					<br><button id="goToTrial10Btn" class="button pulse" disabled autocomplete="off">Next</button>
+					<input type = "hidden" name = "ReacTime_t9" value = "0" id = "RT_t9">
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<div id="trial10" hidden>
+			<div class="videoContainer">
+				<video  id="vsrc10" style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();"> 
+					<source type="video/mp4" src="data:,">
+					Your browser does not support HTML5 video.
+				<input type = "hidden" name = "video10" value = "" id = "playedVideo10">
+				</video>
+			</div>
+
+			<div id="samQuestions10" class="sam" hidden>
+				<h2>Please select how the character in the video is feeling.</h2>
+
+				<div >
+
+				
+				<h3> Arousal </h3> 
+				<h4> From very calm to very agitated </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="arousal1_t10" name="arousal1_t10" value="1"><img src="https://cognovo.eu/files/project-21/arousal1.png" alt="stylized image of a very calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal2_t10" name="arousal2_t10" value="2"><img src="https://cognovo.eu/files/project-21/arousal2.png" alt="stylized image of a calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal3_t10" name="arousal3_t10" value="3"><img src="https://cognovo.eu/files/project-21/arousal3.png" alt="stylized image of a neither calm nor agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal4_t10" name="arousal4_t10" value="4"><img src="https://cognovo.eu/files/project-21/arousal4.png" alt="stylized image of an agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal5_t10" name="arousal5_t10" value="5"><img src="https://cognovo.eu/files/project-21/arousal5.png" alt="stylized image of a very agitated person" /></crowd-radio-button>
+				</crowd-radio-group>
+
+				
+				<h3> Valence </h3> 
+				<h4> From very sad to very happy </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="valence1_t10" name="valence1_t10" value="1"><img src="https://cognovo.eu/files/project-21/valence1.png" alt="stylized image of a very sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence2_t10" name="valence2_t10" value="2"><img src="https://cognovo.eu/files/project-21/valence2.png" alt="stylized image of a sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence3_t10" name="valence3_t10" value="3"><img src="https://cognovo.eu/files/project-21/valence3.png" alt="stylized image of a neither sad nor happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence4_t10" name="valence4_t10" value="4"><img src="https://cognovo.eu/files/project-21/valence4.png" alt="stylized image of a happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence5_t10" name="valence5_t10" value="5"><img src="https://cognovo.eu/files/project-21/valence5.png" alt="stylized image of a very happy person" /></crowd-radio-button>
+				</crowd-radio-group>
+				<div id = "goToTrial11">
+					<br><button id="goToTrial11Btn" class="button pulse" disabled autocomplete="off">Next</button>
+					<input type = "hidden" name = "ReacTime_t10" value = "0" id = "RT_t10">
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<div id="trial11" hidden>
+			<div class="videoContainer">
+				<video  id="vsrc11" style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();"> 
+					<source type="video/mp4" src="data:,">
+					Your browser does not support HTML5 video.
+				<input type = "hidden" name = "video11" value = "" id = "playedVideo11">
+				</video>
+			</div>
+
+			<div id="samQuestions11" class="sam" hidden>
+				<h2>Please select how the character in the video is feeling.</h2>
+
+				<div >
+
+				
+				<h3> Arousal </h3> 
+				<h4> From very calm to very agitated </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="arousal1_t11" name="arousal1_t11" value="1"><img src="https://cognovo.eu/files/project-21/arousal1.png" alt="stylized image of a very calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal2_t11" name="arousal2_t11" value="2"><img src="https://cognovo.eu/files/project-21/arousal2.png" alt="stylized image of a calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal3_t11" name="arousal3_t11" value="3"><img src="https://cognovo.eu/files/project-21/arousal3.png" alt="stylized image of a neither calm nor agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal4_t11" name="arousal4_t11" value="4"><img src="https://cognovo.eu/files/project-21/arousal4.png" alt="stylized image of an agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal5_t11" name="arousal5_t11" value="5"><img src="https://cognovo.eu/files/project-21/arousal5.png" alt="stylized image of a very agitated person" /></crowd-radio-button>
+				</crowd-radio-group>
+
+				
+				<h3> Valence </h3> 
+				<h4> From very sad to very happy </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="valence1_t11" name="valence1_t11" value="1"><img src="https://cognovo.eu/files/project-21/valence1.png" alt="stylized image of a very sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence2_t11" name="valence2_t11" value="2"><img src="https://cognovo.eu/files/project-21/valence2.png" alt="stylized image of a sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence3_t11" name="valence3_t11" value="3"><img src="https://cognovo.eu/files/project-21/valence3.png" alt="stylized image of a neither sad nor happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence4_t11" name="valence4_t11" value="4"><img src="https://cognovo.eu/files/project-21/valence4.png" alt="stylized image of a happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence5_t11" name="valence5_t11" value="5"><img src="https://cognovo.eu/files/project-21/valence5.png" alt="stylized image of a very happy person" /></crowd-radio-button>
+				</crowd-radio-group>
+				<div id = "goToTrial12">
+					<br><button id="goToTrial12Btn" class="button pulse" disabled autocomplete="off">Next</button>
+					<input type = "hidden" name = "ReacTime_t11" value = "0" id = "RT_t11">
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<div id="trial12" hidden>
+			<div class="videoContainer">
+				<video  id="vsrc12" style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();"> 
+					<source type="video/mp4" src="data:,">
+					Your browser does not support HTML5 video.
+				<input type = "hidden" name = "video12" value = "" id = "playedVideo12">
+				</video>
+			</div>
+
+			<div id="samQuestions12" class="sam" hidden>
+				<h2>Please select how the character in the video is feeling.</h2>
+
+				<div >
+
+				
+				<h3> Arousal </h3> 
+				<h4> From very calm to very agitated </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="arousal1_t12" name="arousal1_t12" value="1"><img src="https://cognovo.eu/files/project-21/arousal1.png" alt="stylized image of a very calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal2_t12" name="arousal2_t12" value="2"><img src="https://cognovo.eu/files/project-21/arousal2.png" alt="stylized image of a calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal3_t12" name="arousal3_t12" value="3"><img src="https://cognovo.eu/files/project-21/arousal3.png" alt="stylized image of a neither calm nor agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal4_t12" name="arousal4_t12" value="4"><img src="https://cognovo.eu/files/project-21/arousal4.png" alt="stylized image of an agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal5_t12" name="arousal5_t12" value="5"><img src="https://cognovo.eu/files/project-21/arousal5.png" alt="stylized image of a very agitated person" /></crowd-radio-button>
+				</crowd-radio-group>
+
+				
+				<h3> Valence </h3> 
+				<h4> From very sad to very happy </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="valence1_t12" name="valence1_t12" value="1"><img src="https://cognovo.eu/files/project-21/valence1.png" alt="stylized image of a very sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence2_t12" name="valence2_t12" value="2"><img src="https://cognovo.eu/files/project-21/valence2.png" alt="stylized image of a sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence3_t12" name="valence3_t12" value="3"><img src="https://cognovo.eu/files/project-21/valence3.png" alt="stylized image of a neither sad nor happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence4_t12" name="valence4_t12" value="4"><img src="https://cognovo.eu/files/project-21/valence4.png" alt="stylized image of a happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence5_t12" name="valence5_t12" value="5"><img src="https://cognovo.eu/files/project-21/valence5.png" alt="stylized image of a very happy person" /></crowd-radio-button>
+				</crowd-radio-group>
+				<div id = "goToTrial13">
+					<br><button id="goToTrial13Btn" class="button pulse" disabled autocomplete="off">Next</button>
+					<input type = "hidden" name = "ReacTime_t12" value = "0" id = "RT_t12">
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<div id="trial13" hidden>
+			<div class="videoContainer">
+				<video  id="vsrc13" style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();"> 
+					<source type="video/mp4" src="data:,">
+					Your browser does not support HTML5 video.
+				<input type = "hidden" name = "video13" value = "" id = "playedVideo13">
+				</video>
+			</div>
+
+			<div id="samQuestions13" class="sam" hidden>
+				<h2>Please select how the character in the video is feeling.</h2>
+
+				<div >
+
+				
+				<h3> Arousal </h3> 
+				<h4> From very calm to very agitated </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="arousal1_t13" name="arousal1_t13" value="1"><img src="https://cognovo.eu/files/project-21/arousal1.png" alt="stylized image of a very calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal2_t13" name="arousal2_t13" value="2"><img src="https://cognovo.eu/files/project-21/arousal2.png" alt="stylized image of a calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal3_t13" name="arousal3_t13" value="3"><img src="https://cognovo.eu/files/project-21/arousal3.png" alt="stylized image of a neither calm nor agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal4_t13" name="arousal4_t13" value="4"><img src="https://cognovo.eu/files/project-21/arousal4.png" alt="stylized image of an agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal5_t13" name="arousal5_t13" value="5"><img src="https://cognovo.eu/files/project-21/arousal5.png" alt="stylized image of a very agitated person" /></crowd-radio-button>
+				</crowd-radio-group>
+
+				
+				<h3> Valence </h3> 
+				<h4> From very sad to very happy </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="valence1_t13" name="valence1_t13" value="1"><img src="https://cognovo.eu/files/project-21/valence1.png" alt="stylized image of a very sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence2_t13" name="valence2_t13" value="2"><img src="https://cognovo.eu/files/project-21/valence2.png" alt="stylized image of a sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence3_t13" name="valence3_t13" value="3"><img src="https://cognovo.eu/files/project-21/valence3.png" alt="stylized image of a neither sad nor happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence4_t13" name="valence4_t13" value="4"><img src="https://cognovo.eu/files/project-21/valence4.png" alt="stylized image of a happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence5_t13" name="valence5_t13" value="5"><img src="https://cognovo.eu/files/project-21/valence5.png" alt="stylized image of a very happy person" /></crowd-radio-button>
+				</crowd-radio-group>
+				<div id = "goToTrial14">
+					<br><button id="goToTrial14Btn" class="button pulse" disabled autocomplete="off">Next</button>
+					<input type = "hidden" name = "ReacTime_t13" value = "0" id = "RT_t13">
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<div id="trial14" hidden>
+			<div class="videoContainer">
+				<video  id="vsrc14" style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();"> 
+					<source type="video/mp4" src="data:,">
+					Your browser does not support HTML5 video.
+				<input type = "hidden" name = "video14" value = "" id = "playedVideo14">
+				</video>
+			</div>
+
+			<div id="samQuestions14" class="sam" hidden>
+				<h2>Please select how the character in the video is feeling.</h2>
+
+				<div >
+
+				
+				<h3> Arousal </h3> 
+				<h4> From very calm to very agitated </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="arousal1_t14" name="arousal1_t14" value="1"><img src="https://cognovo.eu/files/project-21/arousal1.png" alt="stylized image of a very calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal2_t14" name="arousal2_t14" value="2"><img src="https://cognovo.eu/files/project-21/arousal2.png" alt="stylized image of a calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal3_t14" name="arousal3_t14" value="3"><img src="https://cognovo.eu/files/project-21/arousal3.png" alt="stylized image of a neither calm nor agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal4_t14" name="arousal4_t14" value="4"><img src="https://cognovo.eu/files/project-21/arousal4.png" alt="stylized image of an agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal5_t14" name="arousal5_t14" value="5"><img src="https://cognovo.eu/files/project-21/arousal5.png" alt="stylized image of a very agitated person" /></crowd-radio-button>
+				</crowd-radio-group>
+
+				
+				<h3> Valence </h3> 
+				<h4> From very sad to very happy </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="valence1_t14" name="valence1_t14" value="1"><img src="https://cognovo.eu/files/project-21/valence1.png" alt="stylized image of a very sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence2_t14" name="valence2_t14" value="2"><img src="https://cognovo.eu/files/project-21/valence2.png" alt="stylized image of a sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence3_t14" name="valence3_t14" value="3"><img src="https://cognovo.eu/files/project-21/valence3.png" alt="stylized image of a neither sad nor happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence4_t14" name="valence4_t14" value="4"><img src="https://cognovo.eu/files/project-21/valence4.png" alt="stylized image of a happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence5_t14" name="valence5_t14" value="5"><img src="https://cognovo.eu/files/project-21/valence5.png" alt="stylized image of a very happy person" /></crowd-radio-button>
+				</crowd-radio-group>
+				<div id = "goToTrial15">
+					<br><button id="goToTrial15Btn" class="button pulse" disabled autocomplete="off">Next</button>
+					<input type = "hidden" name = "ReacTime_t14" value = "0" id = "RT_t14">
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<div id="trial15" hidden>
+			<div class="videoContainer">
+				<video  id="vsrc15" style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();"> 
+					<source type="video/mp4" src="data:,">
+					Your browser does not support HTML5 video.
+				<input type = "hidden" name = "video15" value = "" id = "playedVideo15">
+				</video>
+			</div>
+
+			<div id="samQuestions15" class="sam" hidden>
+				<h2>Please select how the character in the video is feeling.</h2>
+
+				<div >
+
+				
+				<h3> Arousal </h3> 
+				<h4> From very calm to very agitated </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="arousal1_t15" name="arousal1_t15" value="1"><img src="https://cognovo.eu/files/project-21/arousal1.png" alt="stylized image of a very calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal2_t15" name="arousal2_t15" value="2"><img src="https://cognovo.eu/files/project-21/arousal2.png" alt="stylized image of a calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal3_t15" name="arousal3_t15" value="3"><img src="https://cognovo.eu/files/project-21/arousal3.png" alt="stylized image of a neither calm nor agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal4_t15" name="arousal4_t15" value="4"><img src="https://cognovo.eu/files/project-21/arousal4.png" alt="stylized image of an agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal5_t15" name="arousal5_t15" value="5"><img src="https://cognovo.eu/files/project-21/arousal5.png" alt="stylized image of a very agitated person" /></crowd-radio-button>
+				</crowd-radio-group>
+
+				
+				<h3> Valence </h3> 
+				<h4> From very sad to very happy </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="valence1_t15" name="valence1_t15" value="1"><img src="https://cognovo.eu/files/project-21/valence1.png" alt="stylized image of a very sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence2_t15" name="valence2_t15" value="2"><img src="https://cognovo.eu/files/project-21/valence2.png" alt="stylized image of a sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence3_t15" name="valence3_t15" value="3"><img src="https://cognovo.eu/files/project-21/valence3.png" alt="stylized image of a neither sad nor happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence4_t15" name="valence4_t15" value="4"><img src="https://cognovo.eu/files/project-21/valence4.png" alt="stylized image of a happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence5_t15" name="valence5_t15" value="5"><img src="https://cognovo.eu/files/project-21/valence5.png" alt="stylized image of a very happy person" /></crowd-radio-button>
+				</crowd-radio-group>
+				<div id = "goToTrial16">
+					<br><button id="goToTrial16Btn" class="button pulse" disabled autocomplete="off">Next</button>
+					<input type = "hidden" name = "ReacTime_t15" value = "0" id = "RT_t15">
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<div id="trial16" hidden>
+			<div class="videoContainer">
+				<video  id="vsrc16" style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();"> 
+					<source type="video/mp4" src="data:,">
+					Your browser does not support HTML5 video.
+				<input type = "hidden" name = "video16" value = "" id = "playedVideo16">
+				</video>
+			</div>
+
+			<div id="samQuestions16" class="sam" hidden>
+				<h2>Please select how the character in the video is feeling.</h2>
+
+				<div >
+
+				
+				<h3> Arousal </h3> 
+				<h4> From very calm to very agitated </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="arousal1_t16" name="arousal1_t16" value="1"><img src="https://cognovo.eu/files/project-21/arousal1.png" alt="stylized image of a very calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal2_t16" name="arousal2_t16" value="2"><img src="https://cognovo.eu/files/project-21/arousal2.png" alt="stylized image of a calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal3_t16" name="arousal3_t16" value="3"><img src="https://cognovo.eu/files/project-21/arousal3.png" alt="stylized image of a neither calm nor agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal4_t16" name="arousal4_t16" value="4"><img src="https://cognovo.eu/files/project-21/arousal4.png" alt="stylized image of an agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal5_t16" name="arousal5_t16" value="5"><img src="https://cognovo.eu/files/project-21/arousal5.png" alt="stylized image of a very agitated person" /></crowd-radio-button>
+				</crowd-radio-group>
+
+				
+				<h3> Valence </h3> 
+				<h4> From very sad to very happy </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="valence1_t16" name="valence1_t16" value="1"><img src="https://cognovo.eu/files/project-21/valence1.png" alt="stylized image of a very sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence2_t16" name="valence2_t16" value="2"><img src="https://cognovo.eu/files/project-21/valence2.png" alt="stylized image of a sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence3_t16" name="valence3_t16" value="3"><img src="https://cognovo.eu/files/project-21/valence3.png" alt="stylized image of a neither sad nor happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence4_t16" name="valence4_t16" value="4"><img src="https://cognovo.eu/files/project-21/valence4.png" alt="stylized image of a happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence5_t16" name="valence5_t16" value="5"><img src="https://cognovo.eu/files/project-21/valence5.png" alt="stylized image of a very happy person" /></crowd-radio-button>
+				</crowd-radio-group>
+				<div id = "goToTrial17">
+					<br><button id="goToTrial17Btn" class="button pulse" disabled autocomplete="off">Next</button>
+					<input type = "hidden" name = "ReacTime_t16" value = "0" id = "RT_t16">
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<div id="trial17" hidden>
+			<div class="videoContainer">
+				<video  id="vsrc17" style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();"> 
+					<source type="video/mp4" src="data:,">
+					Your browser does not support HTML5 video.
+				<input type = "hidden" name = "video17" value = "" id = "playedVideo17">
+				</video>
+			</div>
+
+			<div id="samQuestions17" class="sam" hidden>
+				<h2>Please select how the character in the video is feeling.</h2>
+
+				<div >
+
+				
+				<h3> Arousal </h3> 
+				<h4> From very calm to very agitated </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="arousal1_t17" name="arousal1_t17" value="1"><img src="https://cognovo.eu/files/project-21/arousal1.png" alt="stylized image of a very calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal2_t17" name="arousal2_t17" value="2"><img src="https://cognovo.eu/files/project-21/arousal2.png" alt="stylized image of a calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal3_t17" name="arousal3_t17" value="3"><img src="https://cognovo.eu/files/project-21/arousal3.png" alt="stylized image of a neither calm nor agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal4_t17" name="arousal4_t17" value="4"><img src="https://cognovo.eu/files/project-21/arousal4.png" alt="stylized image of an agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal5_t17" name="arousal5_t17" value="5"><img src="https://cognovo.eu/files/project-21/arousal5.png" alt="stylized image of a very agitated person" /></crowd-radio-button>
+				</crowd-radio-group>
+
+				
+				<h3> Valence </h3> 
+				<h4> From very sad to very happy </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="valence1_t17" name="valence1_t17" value="1"><img src="https://cognovo.eu/files/project-21/valence1.png" alt="stylized image of a very sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence2_t17" name="valence2_t17" value="2"><img src="https://cognovo.eu/files/project-21/valence2.png" alt="stylized image of a sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence3_t17" name="valence3_t17" value="3"><img src="https://cognovo.eu/files/project-21/valence3.png" alt="stylized image of a neither sad nor happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence4_t17" name="valence4_t17" value="4"><img src="https://cognovo.eu/files/project-21/valence4.png" alt="stylized image of a happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence5_t17" name="valence5_t17" value="5"><img src="https://cognovo.eu/files/project-21/valence5.png" alt="stylized image of a very happy person" /></crowd-radio-button>
+				</crowd-radio-group>
+				<div id = "goToTrial18">
+					<br><button id="goToTrial18Btn" class="button pulse" disabled autocomplete="off">Next</button>
+					<input type = "hidden" name = "ReacTime_t17" value = "0" id = "RT_t17">
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<div id="trial18" hidden>
+			<div class="videoContainer">
+				<video  id="vsrc18" style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();"> 
+					<source type="video/mp4" src="data:,">
+					Your browser does not support HTML5 video.
+				<input type = "hidden" name = "video18" value = "" id = "playedVideo18">
+				</video>
+			</div>
+
+			<div id="samQuestions18" class="sam" hidden>
+				<h2>Please select how the character in the video is feeling.</h2>
+
+				<div >
+
+				
+				<h3> Arousal </h3> 
+				<h4> From very calm to very agitated </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="arousal1_t18" name="arousal1_t18" value="1"><img src="https://cognovo.eu/files/project-21/arousal1.png" alt="stylized image of a very calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal2_t18" name="arousal2_t18" value="2"><img src="https://cognovo.eu/files/project-21/arousal2.png" alt="stylized image of a calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal3_t18" name="arousal3_t18" value="3"><img src="https://cognovo.eu/files/project-21/arousal3.png" alt="stylized image of a neither calm nor agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal4_t18" name="arousal4_t18" value="4"><img src="https://cognovo.eu/files/project-21/arousal4.png" alt="stylized image of an agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal5_t18" name="arousal5_t18" value="5"><img src="https://cognovo.eu/files/project-21/arousal5.png" alt="stylized image of a very agitated person" /></crowd-radio-button>
+				</crowd-radio-group>
+
+				
+				<h3> Valence </h3> 
+				<h4> From very sad to very happy </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="valence1_t18" name="valence1_t18" value="1"><img src="https://cognovo.eu/files/project-21/valence1.png" alt="stylized image of a very sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence2_t18" name="valence2_t18" value="2"><img src="https://cognovo.eu/files/project-21/valence2.png" alt="stylized image of a sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence3_t18" name="valence3_t18" value="3"><img src="https://cognovo.eu/files/project-21/valence3.png" alt="stylized image of a neither sad nor happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence4_t18" name="valence4_t18" value="4"><img src="https://cognovo.eu/files/project-21/valence4.png" alt="stylized image of a happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence5_t18" name="valence5_t18" value="5"><img src="https://cognovo.eu/files/project-21/valence5.png" alt="stylized image of a very happy person" /></crowd-radio-button>
+				</crowd-radio-group>
+				<div id = "goToTrial19">
+					<br><button id="goToTrial19Btn" class="button pulse" disabled autocomplete="off">Next</button>
+					<input type = "hidden" name = "ReacTime_t18" value = "0" id = "RT_t18">
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<div id="trial19" hidden>
+			<div class="videoContainer">
+				<video  id="vsrc19" style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();"> 
+					<source type="video/mp4" src="data:,">
+					Your browser does not support HTML5 video.
+				<input type = "hidden" name = "video19" value = "" id = "playedVideo19">
+				</video>
+			</div>
+
+			<div id="samQuestions19" class="sam" hidden>
+				<h2>Please select how the character in the video is feeling.</h2>
+
+				<div >
+
+				
+				<h3> Arousal </h3> 
+				<h4> From very calm to very agitated </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="arousal1_t19" name="arousal1_t19" value="1"><img src="https://cognovo.eu/files/project-21/arousal1.png" alt="stylized image of a very calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal2_t19" name="arousal2_t19" value="2"><img src="https://cognovo.eu/files/project-21/arousal2.png" alt="stylized image of a calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal3_t19" name="arousal3_t19" value="3"><img src="https://cognovo.eu/files/project-21/arousal3.png" alt="stylized image of a neither calm nor agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal4_t19" name="arousal4_t19" value="4"><img src="https://cognovo.eu/files/project-21/arousal4.png" alt="stylized image of an agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal5_t19" name="arousal5_t19" value="5"><img src="https://cognovo.eu/files/project-21/arousal5.png" alt="stylized image of a very agitated person" /></crowd-radio-button>
+				</crowd-radio-group>
+
+				
+				<h3> Valence </h3> 
+				<h4> From very sad to very happy </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="valence1_t19" name="valence1_t19" value="1"><img src="https://cognovo.eu/files/project-21/valence1.png" alt="stylized image of a very sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence2_t19" name="valence2_t19" value="2"><img src="https://cognovo.eu/files/project-21/valence2.png" alt="stylized image of a sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence3_t19" name="valence3_t19" value="3"><img src="https://cognovo.eu/files/project-21/valence3.png" alt="stylized image of a neither sad nor happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence4_t19" name="valence4_t19" value="4"><img src="https://cognovo.eu/files/project-21/valence4.png" alt="stylized image of a happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence5_t19" name="valence5_t19" value="5"><img src="https://cognovo.eu/files/project-21/valence5.png" alt="stylized image of a very happy person" /></crowd-radio-button>
+				</crowd-radio-group>
+				<div id = "goToTrial20">
+					<br><button id="goToTrial20Btn" class="button pulse" disabled autocomplete="off">Next</button>
+					<input type = "hidden" name = "ReacTime_t19" value = "0" id = "RT_t19">
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<div id="trial20" hidden>
+			<div class="videoContainer">
+				<video  id="vsrc20" style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();"> 
+					<source type="video/mp4" src="data:,">
+					Your browser does not support HTML5 video.
+				<input type = "hidden" name = "video20" value = "" id = "playedVideo20">
+				</video>
+			</div>
+
+			<div id="samQuestions20" class="sam" hidden>
+				<h2>Please select how the character in the video is feeling.</h2>
+
+				<div >
+
+				
+				<h3> Arousal </h3> 
+				<h4> From very calm to very agitated </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="arousal1_t20" name="arousal1_t20" value="1"><img src="https://cognovo.eu/files/project-21/arousal1.png" alt="stylized image of a very calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal2_t20" name="arousal2_t20" value="2"><img src="https://cognovo.eu/files/project-21/arousal2.png" alt="stylized image of a calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal3_t20" name="arousal3_t20" value="3"><img src="https://cognovo.eu/files/project-21/arousal3.png" alt="stylized image of a neither calm nor agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal4_t20" name="arousal4_t20" value="4"><img src="https://cognovo.eu/files/project-21/arousal4.png" alt="stylized image of an agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal5_t20" name="arousal5_t20" value="5"><img src="https://cognovo.eu/files/project-21/arousal5.png" alt="stylized image of a very agitated person" /></crowd-radio-button>
+				</crowd-radio-group>
+
+				
+				<h3> Valence </h3> 
+				<h4> From very sad to very happy </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="valence1_t20" name="valence1_t20" value="1"><img src="https://cognovo.eu/files/project-21/valence1.png" alt="stylized image of a very sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence2_t20" name="valence2_t20" value="2"><img src="https://cognovo.eu/files/project-21/valence2.png" alt="stylized image of a sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence3_t20" name="valence3_t20" value="3"><img src="https://cognovo.eu/files/project-21/valence3.png" alt="stylized image of a neither sad nor happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence4_t20" name="valence4_t20" value="4"><img src="https://cognovo.eu/files/project-21/valence4.png" alt="stylized image of a happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence5_t20" name="valence5_t20" value="5"><img src="https://cognovo.eu/files/project-21/valence5.png" alt="stylized image of a very happy person" /></crowd-radio-button>
+				</crowd-radio-group>
+				<div id = "goToTrial21">
+					<br><button id="goToTrial21Btn" class="button pulse" disabled autocomplete="off">Next</button>
+					<input type = "hidden" name = "ReacTime_t20" value = "0" id = "RT_t20">
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<div id="trial21" hidden>
+			<div class="videoContainer">
+				<video  id="vsrc21" style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();"> 
+					<source type="video/mp4" src="data:,">
+					Your browser does not support HTML5 video.
+				<input type = "hidden" name = "video21" value = "" id = "playedVideo21">
+				</video>
+			</div>
+
+			<div id="samQuestions21" class="sam" hidden>
+				<h2>Please select how the character in the video is feeling.</h2>
+
+				<div >
+
+				
+				<h3> Arousal </h3> 
+				<h4> From very calm to very agitated </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="arousal1_t21" name="arousal1_t21" value="1"><img src="https://cognovo.eu/files/project-21/arousal1.png" alt="stylized image of a very calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal2_t21" name="arousal2_t21" value="2"><img src="https://cognovo.eu/files/project-21/arousal2.png" alt="stylized image of a calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal3_t21" name="arousal3_t21" value="3"><img src="https://cognovo.eu/files/project-21/arousal3.png" alt="stylized image of a neither calm nor agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal4_t21" name="arousal4_t21" value="4"><img src="https://cognovo.eu/files/project-21/arousal4.png" alt="stylized image of an agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal5_t21" name="arousal5_t21" value="5"><img src="https://cognovo.eu/files/project-21/arousal5.png" alt="stylized image of a very agitated person" /></crowd-radio-button>
+				</crowd-radio-group>
+
+				
+				<h3> Valence </h3> 
+				<h4> From very sad to very happy </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="valence1_t21" name="valence1_t21" value="1"><img src="https://cognovo.eu/files/project-21/valence1.png" alt="stylized image of a very sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence2_t21" name="valence2_t21" value="2"><img src="https://cognovo.eu/files/project-21/valence2.png" alt="stylized image of a sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence3_t21" name="valence3_t21" value="3"><img src="https://cognovo.eu/files/project-21/valence3.png" alt="stylized image of a neither sad nor happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence4_t21" name="valence4_t21" value="4"><img src="https://cognovo.eu/files/project-21/valence4.png" alt="stylized image of a happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence5_t21" name="valence5_t21" value="5"><img src="https://cognovo.eu/files/project-21/valence5.png" alt="stylized image of a very happy person" /></crowd-radio-button>
+				</crowd-radio-group>
+				<div id = "goToTrial22">
+					<br><button id="goToTrial22Btn" class="button pulse" disabled autocomplete="off">Next</button>
+					<input type = "hidden" name = "ReacTime_t21" value = "0" id = "RT_t21">
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<div id="trial22" hidden>
+			<div class="videoContainer">
+				<video  id="vsrc22" style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();"> 
+					<source type="video/mp4" src="data:,">
+					Your browser does not support HTML5 video.
+				<input type = "hidden" name = "video22" value = "" id = "playedVideo22">
+				</video>
+			</div>
+
+			<div id="samQuestions22" class="sam" hidden>
+				<h2>Please select how the character in the video is feeling.</h2>
+
+				<div >
+
+				
+				<h3> Arousal </h3> 
+				<h4> From very calm to very agitated </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="arousal1_t22" name="arousal1_t22" value="1"><img src="https://cognovo.eu/files/project-21/arousal1.png" alt="stylized image of a very calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal2_t22" name="arousal2_t22" value="2"><img src="https://cognovo.eu/files/project-21/arousal2.png" alt="stylized image of a calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal3_t22" name="arousal3_t22" value="3"><img src="https://cognovo.eu/files/project-21/arousal3.png" alt="stylized image of a neither calm nor agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal4_t22" name="arousal4_t22" value="4"><img src="https://cognovo.eu/files/project-21/arousal4.png" alt="stylized image of an agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal5_t22" name="arousal5_t22" value="5"><img src="https://cognovo.eu/files/project-21/arousal5.png" alt="stylized image of a very agitated person" /></crowd-radio-button>
+				</crowd-radio-group>
+
+				
+				<h3> Valence </h3> 
+				<h4> From very sad to very happy </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="valence1_t22" name="valence1_t22" value="1"><img src="https://cognovo.eu/files/project-21/valence1.png" alt="stylized image of a very sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence2_t22" name="valence2_t22" value="2"><img src="https://cognovo.eu/files/project-21/valence2.png" alt="stylized image of a sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence3_t22" name="valence3_t22" value="3"><img src="https://cognovo.eu/files/project-21/valence3.png" alt="stylized image of a neither sad nor happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence4_t22" name="valence4_t22" value="4"><img src="https://cognovo.eu/files/project-21/valence4.png" alt="stylized image of a happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence5_t22" name="valence5_t22" value="5"><img src="https://cognovo.eu/files/project-21/valence5.png" alt="stylized image of a very happy person" /></crowd-radio-button>
+				</crowd-radio-group>
+				<div id = "goToTrial23">
+					<br><button id="goToTrial23Btn" class="button pulse" disabled autocomplete="off">Next</button>
+					<input type = "hidden" name = "ReacTime_t22" value = "0" id = "RT_t22">
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<div id="trial23" hidden>
+			<div class="videoContainer">
+				<video  id="vsrc23" style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();"> 
+					<source type="video/mp4" src="data:,">
+					Your browser does not support HTML5 video.
+				<input type = "hidden" name = "video23" value = "" id = "playedVideo23">
+				</video>
+			</div>
+
+			<div id="samQuestions23" class="sam" hidden>
+				<h2>Please select how the character in the video is feeling.</h2>
+
+				<div >
+
+				
+				<h3> Arousal </h3> 
+				<h4> From very calm to very agitated </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="arousal1_t23" name="arousal1_t23" value="1"><img src="https://cognovo.eu/files/project-21/arousal1.png" alt="stylized image of a very calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal2_t23" name="arousal2_t23" value="2"><img src="https://cognovo.eu/files/project-21/arousal2.png" alt="stylized image of a calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal3_t23" name="arousal3_t23" value="3"><img src="https://cognovo.eu/files/project-21/arousal3.png" alt="stylized image of a neither calm nor agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal4_t23" name="arousal4_t23" value="4"><img src="https://cognovo.eu/files/project-21/arousal4.png" alt="stylized image of an agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal5_t23" name="arousal5_t23" value="5"><img src="https://cognovo.eu/files/project-21/arousal5.png" alt="stylized image of a very agitated person" /></crowd-radio-button>
+				</crowd-radio-group>
+
+				
+				<h3> Valence </h3> 
+				<h4> From very sad to very happy </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="valence1_t23" name="valence1_t23" value="1"><img src="https://cognovo.eu/files/project-21/valence1.png" alt="stylized image of a very sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence2_t23" name="valence2_t23" value="2"><img src="https://cognovo.eu/files/project-21/valence2.png" alt="stylized image of a sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence3_t23" name="valence3_t23" value="3"><img src="https://cognovo.eu/files/project-21/valence3.png" alt="stylized image of a neither sad nor happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence4_t23" name="valence4_t23" value="4"><img src="https://cognovo.eu/files/project-21/valence4.png" alt="stylized image of a happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence5_t23" name="valence5_t23" value="5"><img src="https://cognovo.eu/files/project-21/valence5.png" alt="stylized image of a very happy person" /></crowd-radio-button>
+				</crowd-radio-group>
+				<div id = "goToTrial24">
+					<br><button id="goToTrial24Btn" class="button pulse" disabled autocomplete="off">Next</button>
+					<input type = "hidden" name = "ReacTime_t23" value = "0" id = "RT_t23">
+				</div>
+			</div>
+		</div>
+		</div>
+		
+		<div id="trial24" hidden>
+	
+			<div class="videoContainer">
+				<video  id="vsrc24" style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();"> 
+					<source type="video/mp4" src="data:,">
+					Your browser does not support HTML5 video.
+				<input type = "hidden" name = "video24" value = "" id = "playedVideo24">
+				</video>
+			</div>
+
+			<div id="samQuestions24" class="sam" hidden>
+				<h2>Please select how the character in the video is feeling.</h2>
+
+				<div >
+
+				
+				<h3> Arousal </h3> 
+				<h4> From very calm to very agitated </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="arousal1_t24" name="arousal1_t24" value="1"><img src="https://cognovo.eu/files/project-21/arousal1.png" alt="stylized image of a very calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal2_t24" name="arousal2_t24" value="2"><img src="https://cognovo.eu/files/project-21/arousal2.png" alt="stylized image of a calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal3_t24" name="arousal3_t24" value="3"><img src="https://cognovo.eu/files/project-21/arousal3.png" alt="stylized image of a neither calm nor agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal4_t24" name="arousal4_t24" value="4"><img src="https://cognovo.eu/files/project-21/arousal4.png" alt="stylized image of an agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal5_t24" name="arousal5_t24" value="5"><img src="https://cognovo.eu/files/project-21/arousal5.png" alt="stylized image of a very agitated person" /></crowd-radio-button>
+				</crowd-radio-group>
+
+				
+				<h3> Valence </h3> 
+				<h4> From very sad to very happy </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="valence1_t24" name="valence1_t24" value="1"><img src="https://cognovo.eu/files/project-21/valence1.png" alt="stylized image of a very sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence2_t24" name="valence2_t24" value="2"><img src="https://cognovo.eu/files/project-21/valence2.png" alt="stylized image of a sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence3_t24" name="valence3_t24" value="3"><img src="https://cognovo.eu/files/project-21/valence3.png" alt="stylized image of a neither sad nor happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence4_t24" name="valence4_t24" value="4"><img src="https://cognovo.eu/files/project-21/valence4.png" alt="stylized image of a happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence5_t24" name="valence5_t24" value="5"><img src="https://cognovo.eu/files/project-21/valence5.png" alt="stylized image of a very happy person" /></crowd-radio-button>
+				</crowd-radio-group>
+				<div id = "goToTrial25">
+					<br><button id="goToTrial25Btn" class="button pulse" disabled autocomplete="off">Next</button>
+					<input type = "hidden" name = "ReacTime_t24" value = "0" id = "RT_t24">
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<div id="trial25" hidden>
+			<div class="videoContainer">
+				<video  id="vsrc25" style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();"> 
+					<source type="video/mp4" src="data:,">
+					Your browser does not support HTML5 video.
+				<input type = "hidden" name = "video25" value = "" id = "playedVideo25">
+				</video>
+			</div>
+
+			<div id="samQuestions25" class="sam" hidden>
+				<h2>Please select how the character in the video is feeling.</h2>
+
+				<div >
+
+				
+				<h3> Arousal </h3> 
+				<h4> From very calm to very agitated </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="arousal1_t25" name="arousal1_t25" value="1"><img src="https://cognovo.eu/files/project-21/arousal1.png" alt="stylized image of a very calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal2_t25" name="arousal2_t25" value="2"><img src="https://cognovo.eu/files/project-21/arousal2.png" alt="stylized image of a calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal3_t25" name="arousal3_t25" value="3"><img src="https://cognovo.eu/files/project-21/arousal3.png" alt="stylized image of a neither calm nor agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal4_t25" name="arousal4_t25" value="4"><img src="https://cognovo.eu/files/project-21/arousal4.png" alt="stylized image of an agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal5_t25" name="arousal5_t25" value="5"><img src="https://cognovo.eu/files/project-21/arousal5.png" alt="stylized image of a very agitated person" /></crowd-radio-button>
+				</crowd-radio-group>
+
+				
+				<h3> Valence </h3> 
+				<h4> From very sad to very happy </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="valence1_t25" name="valence1_t25" value="1"><img src="https://cognovo.eu/files/project-21/valence1.png" alt="stylized image of a very sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence2_t25" name="valence2_t25" value="2"><img src="https://cognovo.eu/files/project-21/valence2.png" alt="stylized image of a sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence3_t25" name="valence3_t25" value="3"><img src="https://cognovo.eu/files/project-21/valence3.png" alt="stylized image of a neither sad nor happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence4_t25" name="valence4_t25" value="4"><img src="https://cognovo.eu/files/project-21/valence4.png" alt="stylized image of a happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence5_t25" name="valence5_t25" value="5"><img src="https://cognovo.eu/files/project-21/valence5.png" alt="stylized image of a very happy person" /></crowd-radio-button>
+				</crowd-radio-group>
+				<div id = "goToTrial26">
+					<br><button id="goToTrial26Btn" class="button pulse" disabled autocomplete="off">Next</button>
+					<input type = "hidden" name = "ReacTime_t25" value = "0" id = "RT_t25">
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<div id="trial26" hidden>
+			<div class="videoContainer">
+				<video  id="vsrc26" style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();"> 
+					<source type="video/mp4" src="data:,">
+					Your browser does not support HTML5 video.
+				<input type = "hidden" name = "video26" value = "" id = "playedVideo26">
+				</video>
+			</div>
+
+			<div id="samQuestions26" class="sam" hidden>
+				<h2>Please select how the character in the video is feeling.</h2>
+
+				<div >
+
+				
+				<h3> Arousal </h3> 
+				<h4> From very calm to very agitated </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="arousal1_t26" name="arousal1_t26" value="1"><img src="https://cognovo.eu/files/project-21/arousal1.png" alt="stylized image of a very calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal2_t26" name="arousal2_t26" value="2"><img src="https://cognovo.eu/files/project-21/arousal2.png" alt="stylized image of a calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal3_t26" name="arousal3_t26" value="3"><img src="https://cognovo.eu/files/project-21/arousal3.png" alt="stylized image of a neither calm nor agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal4_t26" name="arousal4_t26" value="4"><img src="https://cognovo.eu/files/project-21/arousal4.png" alt="stylized image of an agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal5_t26" name="arousal5_t26" value="5"><img src="https://cognovo.eu/files/project-21/arousal5.png" alt="stylized image of a very agitated person" /></crowd-radio-button>
+				</crowd-radio-group>
+
+				
+				<h3> Valence </h3> 
+				<h4> From very sad to very happy </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="valence1_t26" name="valence1_t26" value="1"><img src="https://cognovo.eu/files/project-21/valence1.png" alt="stylized image of a very sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence2_t26" name="valence2_t26" value="2"><img src="https://cognovo.eu/files/project-21/valence2.png" alt="stylized image of a sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence3_t26" name="valence3_t26" value="3"><img src="https://cognovo.eu/files/project-21/valence3.png" alt="stylized image of a neither sad nor happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence4_t26" name="valence4_t26" value="4"><img src="https://cognovo.eu/files/project-21/valence4.png" alt="stylized image of a happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence5_t26" name="valence5_t26" value="5"><img src="https://cognovo.eu/files/project-21/valence5.png" alt="stylized image of a very happy person" /></crowd-radio-button>
+				</crowd-radio-group>
+				<div id = "goToTrial27">
+					<br><button id="goToTrial27Btn" class="button pulse" disabled autocomplete="off">Next</button>
+					<input type = "hidden" name = "ReacTime_t26" value = "0" id = "RT_t26">
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<div id="trial27" hidden>
+			<div class="videoContainer">
+				<video  id="vsrc27" style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();"> 
+					<source type="video/mp4" src="data:,">
+					Your browser does not support HTML5 video.
+				<input type = "hidden" name = "video27" value = "" id = "playedVideo27">
+				</video>
+			</div>
+
+			<div id="samQuestions27" class="sam" hidden>
+				<h2>Please select how the character in the video is feeling.</h2>
+
+				<div >
+
+				
+				<h3> Arousal </h3> 
+				<h4> From very calm to very agitated </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="arousal1_t27" name="arousal1_t27" value="1"><img src="https://cognovo.eu/files/project-21/arousal1.png" alt="stylized image of a very calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal2_t27" name="arousal2_t27" value="2"><img src="https://cognovo.eu/files/project-21/arousal2.png" alt="stylized image of a calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal3_t27" name="arousal3_t27" value="3"><img src="https://cognovo.eu/files/project-21/arousal3.png" alt="stylized image of a neither calm nor agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal4_t27" name="arousal4_t27" value="4"><img src="https://cognovo.eu/files/project-21/arousal4.png" alt="stylized image of an agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal5_t27" name="arousal5_t27" value="5"><img src="https://cognovo.eu/files/project-21/arousal5.png" alt="stylized image of a very agitated person" /></crowd-radio-button>
+				</crowd-radio-group>
+
+				
+				<h3> Valence </h3> 
+				<h4> From very sad to very happy </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="valence1_t27" name="valence1_t27" value="1"><img src="https://cognovo.eu/files/project-21/valence1.png" alt="stylized image of a very sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence2_t27" name="valence2_t27" value="2"><img src="https://cognovo.eu/files/project-21/valence2.png" alt="stylized image of a sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence3_t27" name="valence3_t27" value="3"><img src="https://cognovo.eu/files/project-21/valence3.png" alt="stylized image of a neither sad nor happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence4_t27" name="valence4_t27" value="4"><img src="https://cognovo.eu/files/project-21/valence4.png" alt="stylized image of a happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence5_t27" name="valence5_t27" value="5"><img src="https://cognovo.eu/files/project-21/valence5.png" alt="stylized image of a very happy person" /></crowd-radio-button>
+				</crowd-radio-group>
+				<div id = "goToTrial28">
+					<br><button id="goToTrial28Btn" class="button pulse" disabled autocomplete="off">Next</button>
+					<input type = "hidden" name = "ReacTime_t27" value = "0" id = "RT_t27">
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<div id="trial28" hidden>
+			<div class="videoContainer">
+				<video  id="vsrc28" style="width:100%" poster="https://cognovo.eu/files/project-21/poster.png" onclick="this.play();"> 
+					<source type="video/mp4" src="data:,">
+					Your browser does not support HTML5 video.
+				<input type = "hidden" name = "video28" value = "" id = "playedVideo28">
+				</video>
+			</div>
+
+			<div id="samQuestions28" class="sam" hidden>
+				<h2>Please select how the character in the video is feeling.</h2>
+
+				<div >
+
+				
+				<h3> Arousal </h3> 
+				<h4> From very calm to very agitated </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="arousal1_t28" name="arousal1_t28" value="1"><img src="https://cognovo.eu/files/project-21/arousal1.png" alt="stylized image of a very calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal2_t28" name="arousal2_t28" value="2"><img src="https://cognovo.eu/files/project-21/arousal2.png" alt="stylized image of a calm person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal3_t28" name="arousal3_t28" value="3"><img src="https://cognovo.eu/files/project-21/arousal3.png" alt="stylized image of a neither calm nor agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal4_t28" name="arousal4_t28" value="4"><img src="https://cognovo.eu/files/project-21/arousal4.png" alt="stylized image of an agitated person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="arousal5_t28" name="arousal5_t28" value="5"><img src="https://cognovo.eu/files/project-21/arousal5.png" alt="stylized image of a very agitated person" /></crowd-radio-button>
+				</crowd-radio-group>
+
+				
+				<h3> Valence </h3> 
+				<h4> From very sad to very happy </h4>
+				
+				<crowd-radio-group>
+					<crowd-radio-button class="mrad" id="valence1_t28" name="valence1_t28" value="1"><img src="https://cognovo.eu/files/project-21/valence1.png" alt="stylized image of a very sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence2_t28" name="valence2_t28" value="2"><img src="https://cognovo.eu/files/project-21/valence2.png" alt="stylized image of a sad person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence3_t28" name="valence3_t28" value="3"><img src="https://cognovo.eu/files/project-21/valence3.png" alt="stylized image of a neither sad nor happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence4_t28" name="valence4_t28" value="4"><img src="https://cognovo.eu/files/project-21/valence4.png" alt="stylized image of a happy person" /></crowd-radio-button>
+					<crowd-radio-button class="mrad" id="valence5_t28" name="valence5_t28" value="5"><img src="https://cognovo.eu/files/project-21/valence5.png" alt="stylized image of a very happy person" /></crowd-radio-button>
+				</crowd-radio-group>
+				<div id = "goToBG">
+					<br><button id="goToTrial29Btn" class="button pulse" disabled autocomplete="off">Next</button>
+					<input type = "hidden" name = "ReacTime_t28" value = "0" id = "RT_t28">
+				</div>
+			</div>
+		</div>
+		</div>
+
+
+		<div id="backgroundQuestions" hidden>
+			<h3>
+				What is your gender?
+			</h3>
+			<crowd-radio-group>
+				<crowd-radio-button id="female" name="female" value="f">Female</crowd-radio-button>
+				<crowd-radio-button id="male" name="male" value="m">Male</crowd-radio-button>
+				<crowd-radio-button id="nonbinary" name="nonbinary" value="nb">Non-binary</crowd-radio-button>
+				<crowd-radio-button id="nosay" name="nosay" value="ns">Prefer not to say</crowd-radio-button>
+			</crowd-radio-group>
+
+			<h3>
+				What is your age? (18+)
+			</h3>
+			<div class="form-group">
+				<span>Age</span>
+				<crowd-input name="Age" type="number" required min=18 max=99 class="form-field" placeholder="Write your age"></crowd-input>
+			</div>
+
+			<h3>
+				What is your country of origin?
+			</h3>
+			<div class="form-group">
+				<span>Country: </span>
+				<crowd-input name="Country" required class="form-field" placeholder="Write your country"></crowd-input>
+			</div>
+
+			<h3>
+				What is your English language fluency?
+			</h3>
+			<crowd-radio-group>
+				<crowd-radio-button id="native" name="native" value="n">Native</crowd-radio-button>
+				<crowd-radio-button id="near-native" name="near-native" value="nn">Near native</crowd-radio-button>
+				<crowd-radio-button id="fluent" name="fluent" value="f">Fluent</crowd-radio-button>
+				<crowd-radio-button id="basic" name="basic" value="b">Basic</crowd-radio-button>
+			</crowd-radio-group>
+
+			<h3>
+				Do you have any comments on the task?
+			</h3>
+			<div class="form-group">
+				<span>Comments: </span>
+				<crowd-input name="Comments" class="form-field" placeholder="Write your comments"></crowd-input>
+			</div>
+
+		</div>
+
+		<crowd-button form-action="submit" id="submitButton" hidden>Submit</crowd-button>
+		
+		<script>
+
+			/* taken from https://stackoverflow.com/a/7053197 */
+			function ready(callback){
+    			if (document.readyState!='loading') callback();
+    			else if (document.addEventListener) document.addEventListener('DOMContentLoaded', callback);
+    			else document.attachEvent('onreadystatechange', function(){
+        			if (document.readyState=='complete') callback();
+    			});
+			}
+			
+			// detect browser and store it in hidden input
+			var usedBrowser = navigator.userAgent;
+			document.getElementById("browser").value = usedBrowser;
+			
+			// detect user screen size and store it in hidden input
+			var userWidth = screen.availWidth;
+			var userHeight = screen.availHeight;
+			document.getElementById("screen").value = userWidth + "x" + userHeight;
+			
+			var devicePixels = window.devicePixelRatio;
+			document.getElementById("devicePx").value = devicePixels;
+			
+			// detect and store colour and pixel depth
+			var colourDepth = screen.colorDepth;
+			var pixelDepth = screen.pixelDepth;
+			document.getElementById("colour").value = colourDepth;
+			document.getElementById("pixel").value = pixelDepth;
+			
+			
+
+			// array containing all the video files
+			var videos = ["https://cognovo.eu/files/project-21/F_SUNGLASSES_NEU_NSM.mp4",
+				"https://cognovo.eu/files/project-21/F_SUNGLASSES_NEU_NSM_NA.mp4",
+				"https://cognovo.eu/files/project-21/F_SUNGLASSES_NEU_SM_NA.mp4",
+				"https://cognovo.eu/files/project-21/F_SUNGLASSES_NEU_SM.mp4",
+				"https://cognovo.eu/files/project-21/F_SUNGLASSES_NEU_SMF.mp4",
+				"https://cognovo.eu/files/project-21/F_SUNGLASSES_NEU_SMV.mp4",
+				"https://cognovo.eu/files/project-21/F_TRANSMITTER_NEU_NSM.mp4",
+				"https://cognovo.eu/files/project-21/F_TRANSMITTER_NEU_NSM_NA.mp4",
+				"https://cognovo.eu/files/project-21/F_TRANSMITTER_NEU_SM.mp4",
+				"https://cognovo.eu/files/project-21/F_TRANSMITTER_NEU_SM_NA.mp4",    
+				"https://cognovo.eu/files/project-21/F_TRANSMITTER_NEU_SMF.mp4",
+				"https://cognovo.eu/files/project-21/F_TRANSMITTER_NEU_SMV.mp4",
+				"https://cognovo.eu/files/project-21/M_SUNGLASSES_NEU_NSM.mp4",     
+				"https://cognovo.eu/files/project-21/M_SUNGLASSES_NEU_NSM_NA.mp4",
+				"https://cognovo.eu/files/project-21/M_SUNGLASSES_NEU_SM.mp4",     
+				"https://cognovo.eu/files/project-21/M_SUNGLASSES_NEU_SM_NA.mp4",
+				"https://cognovo.eu/files/project-21/M_SUNGLASSES_NEU_SMF.mp4",     
+				"https://cognovo.eu/files/project-21/M_SUNGLASSES_NEU_SMV.mp4",
+				"https://cognovo.eu/files/project-21/M_TRANSMITTER_NEU_NSM.mp4",
+				"https://cognovo.eu/files/project-21/M_TRANSMITTER_NEU_NSM_NA.mp4",
+				"https://cognovo.eu/files/project-21/M_TRANSMITTER_NEU_SM.mp4", 
+				"https://cognovo.eu/files/project-21/M_TRANSMITTER_NEU_SM_NA.mp4",
+				"https://cognovo.eu/files/project-21/M_TRANSMITTER_NEU_SMF.mp4",
+				"https://cognovo.eu/files/project-21/M_TRANSMITTER_NEU_SMV.mp4",   
+				"https://cognovo.eu/files/project-21/SUNGLASSES_NEU_NSM_NV.mp4",
+				"https://cognovo.eu/files/project-21/SUNGLASSES_NEU_SM_NV.mp4",
+				"https://cognovo.eu/files/project-21/TRANSMITTER_NEU_NSM_NV.mp4",
+				"https://cognovo.eu/files/project-21/TRANSMITTER_NEU_SM_NV.mp4"];
+				
+			// create variables for reaction time calculations
+			var startTime;
+			
+			var endTime;
+
+			// we start from state machine 1, which is the first page (consent form)
+			var state = 1;
+			
+			
+			//used to show and hide the correct trials
+			var trialNumber = 1;
+
+			var currentVideo;
+			
+			
+			/* This is called whenever the content of the html page is loaded. 
+			This makes sure that "Next1" and "mrad" exists before trying to change it */
+			ready(function(){
+				// Disable back-button and accidental backspace and mouse-button navigation
+				history.pushState(null, document.title, location.href);
+				window.addEventListener('popstate', function (event) {
+					history.pushState(null, document.title, location.href);
+				});
+
+				// Making sure that the button stays disabled even on reload (Firefox issue)
+				document.getElementById("Next1").disabled = true;
+			
+				// call the fun() function every time there is a change in an item of class mrad in the current state
+				var ratingImage = document.querySelectorAll('.mrad');
+				for (var i = 0, len = ratingImage.length; i < len; i++){
+					ratingImage[i].addEventListener('change', fun);
+				}
+	
+				createListenersForNext();
+			});
+
+
+			// function to keep the "go to next trial" buttons disabled until one rating per set (arousal and valence) have been checked
+			function fun(){
+				var arousalSelected = false;
+				var valenceSelected = false;
+				var i;
+
+				for (i = 1; i <= 5 ; i++){
+					var currentArId = "arousal" + i + "_t" + (trialNumber - 1);
+					var currentValId = "valence" + i + "_t" + (trialNumber - 1);
+					if (document.getElementById(currentArId).getAttribute("aria-checked") == "true") {
+						arousalSelected = true;
+					}
+
+					if (document.getElementById(currentValId).getAttribute("aria-checked") == "true") {
+						valenceSelected = true;
+					}
+				}
+
+				if (arousalSelected == true && valenceSelected == true) {
+					document.getElementById("goToTrial" + trialNumber + "Btn").disabled = false;
+				}
+			}
+			
+
+
+			/* Create event listeners for next buttons */
+			function createListenersForNext(){
+				// call function nextElement() when an item is clicked
+				document.getElementById("goToHeadphonesBtn").addEventListener("click", nextElement);
+				document.getElementById("headphonesBtn").addEventListener("click", function () {
+					enableNext("Next1");
+				}, false);
+				document.getElementById("Next1").addEventListener("click", nextElement);
+				document.getElementById("Next2").addEventListener("click", nextElement);
+				document.getElementById("goToTrial2Btn").addEventListener("click", nextElement);
+				document.getElementById("goToTrial2Btn").addEventListener("click", RTCalc);
+				document.getElementById("goToTrial3Btn").addEventListener("click", nextElement);
+				document.getElementById("goToTrial3Btn").addEventListener("click", RTCalc);
+				document.getElementById("goToTrial4Btn").addEventListener("click", nextElement);
+				document.getElementById("goToTrial4Btn").addEventListener("click", RTCalc);
+				document.getElementById("goToTrial5Btn").addEventListener("click", nextElement);
+				document.getElementById("goToTrial5Btn").addEventListener("click", RTCalc);
+				document.getElementById("goToTrial6Btn").addEventListener("click", nextElement);
+				document.getElementById("goToTrial6Btn").addEventListener("click", RTCalc);
+				document.getElementById("goToTrial7Btn").addEventListener("click", nextElement);
+				document.getElementById("goToTrial7Btn").addEventListener("click", RTCalc);
+				document.getElementById("goToTrial8Btn").addEventListener("click", nextElement);
+				document.getElementById("goToTrial8Btn").addEventListener("click", RTCalc);
+				document.getElementById("goToTrial9Btn").addEventListener("click", nextElement);
+				document.getElementById("goToTrial9Btn").addEventListener("click", RTCalc);
+				document.getElementById("goToTrial10Btn").addEventListener("click", nextElement);
+				document.getElementById("goToTrial10Btn").addEventListener("click", RTCalc);
+				document.getElementById("goToTrial11Btn").addEventListener("click", nextElement);
+				document.getElementById("goToTrial11Btn").addEventListener("click", RTCalc);
+				document.getElementById("goToTrial12Btn").addEventListener("click", nextElement);
+				document.getElementById("goToTrial12Btn").addEventListener("click", RTCalc);
+				document.getElementById("goToTrial13Btn").addEventListener("click", nextElement);
+				document.getElementById("goToTrial13Btn").addEventListener("click", RTCalc);
+				document.getElementById("goToTrial14Btn").addEventListener("click", nextElement);
+				document.getElementById("goToTrial14Btn").addEventListener("click", RTCalc);
+				document.getElementById("goToTrial15Btn").addEventListener("click", nextElement);
+				document.getElementById("goToTrial15Btn").addEventListener("click", RTCalc);
+				document.getElementById("goToTrial16Btn").addEventListener("click", nextElement);
+				document.getElementById("goToTrial16Btn").addEventListener("click", RTCalc);
+				document.getElementById("goToTrial17Btn").addEventListener("click", nextElement);
+				document.getElementById("goToTrial17Btn").addEventListener("click", RTCalc);
+				document.getElementById("goToTrial18Btn").addEventListener("click", nextElement);
+				document.getElementById("goToTrial18Btn").addEventListener("click", RTCalc);
+				document.getElementById("goToTrial19Btn").addEventListener("click", nextElement);
+				document.getElementById("goToTrial19Btn").addEventListener("click", RTCalc);
+				document.getElementById("goToTrial20Btn").addEventListener("click", nextElement);
+				document.getElementById("goToTrial20Btn").addEventListener("click", RTCalc);
+				document.getElementById("goToTrial21Btn").addEventListener("click", nextElement);
+				document.getElementById("goToTrial21Btn").addEventListener("click", RTCalc);
+				document.getElementById("goToTrial22Btn").addEventListener("click", nextElement);
+				document.getElementById("goToTrial22Btn").addEventListener("click", RTCalc);
+				document.getElementById("goToTrial23Btn").addEventListener("click", nextElement);
+				document.getElementById("goToTrial23Btn").addEventListener("click", RTCalc);
+				document.getElementById("goToTrial24Btn").addEventListener("click", nextElement);
+				document.getElementById("goToTrial24Btn").addEventListener("click", RTCalc);
+				document.getElementById("goToTrial25Btn").addEventListener("click", nextElement);
+				document.getElementById("goToTrial25Btn").addEventListener("click", RTCalc);
+				document.getElementById("goToTrial26Btn").addEventListener("click", nextElement);
+				document.getElementById("goToTrial26Btn").addEventListener("click", RTCalc);
+				document.getElementById("goToTrial27Btn").addEventListener("click", nextElement);
+				document.getElementById("goToTrial27Btn").addEventListener("click", RTCalc);
+				document.getElementById("goToTrial28Btn").addEventListener("click", nextElement);
+				document.getElementById("goToTrial28Btn").addEventListener("click", RTCalc);
+				document.getElementById("goToTrial29Btn").addEventListener("click", nextElement);
+				document.getElementById("goToTrial29Btn").addEventListener("click", RTCalc);
+			}
+
+			// allow "next" button to be clicked only when an answer has been selected
+			function enableNext(button) {
+				if(document.getElementById("headphonesBtn").checked){
+					//Set the disabled property to FALSE and enable the button.
+					document.getElementById(button).disabled = false;
+
+				} else{
+					//Otherwise, keep the next button disabled
+					document.getElementById(button).disabled = true;
+				}
+			}
+
+			// show the rating scales (arousal and valence) after the video
+			function goToRating(button) {
+				document.getElementById(button).hidden = false;
+			}
+
+			// function to update the state machine and display the correct elements (trials, attention checks, background questions) in the page
+			function nextElement() {
+				state++;
+
+
+				// state machine 2 is the headphones button
+				if (state == 2) {
+					document.getElementById("headphonesButton").hidden = false;
+					document.getElementById("goToPractice").hidden = false;
+					document.getElementById("instructions").hidden = true;
+					document.getElementById("goToHeadphones").hidden = true;
+
+					
+				// state machine 3 is the practice trial
+				} else if (state == 3) {
+					document.getElementById("headphonesButton").hidden = true;
+					document.getElementById("goToPractice").hidden = true;
+					document.getElementById("practiceTrial").hidden = false;
+					
+				
+				// state machine 32 is the final page (questionnaire + submit button)
+				} else if (state == 32) { 
+					document.getElementById("backgroundQuestions").hidden = false;
+					document.getElementById("submitButton").hidden = false;
+					document.getElementById("trial" + (trialNumber - 1)).hidden = true;
+
+
+				// state machine 4 to 31 are the actual experiment trials
+				} else if (state >= 4 && state <= 31) {
+					if (trialNumber >= 2) {
+						document.getElementById("trial" + (trialNumber - 1)).hidden = true;
+					}
+					document.getElementById("trial" + trialNumber).hidden = false;
+					document.getElementById("instructions").hidden = true;
+					document.getElementById("headphonesButton").hidden = true;
+					document.getElementById("goToTrial1").hidden = true;
+					document.getElementById("goToHeadphones").hidden = true;
+					document.getElementById("practiceTrial").hidden = true;
+				
+				
+					// select a random video from the array to be played
+					var selectVideo = Math.floor(Math.random() * videos.length);
+					currentVideo = videos[selectVideo];
+					document.getElementById('vsrc' + trialNumber).src = currentVideo;
+					
+
+					// log which video was played
+					document.getElementById("playedVideo" + trialNumber).value = currentVideo;
+
+
+					var index1 = videos.indexOf(currentVideo);
+					videos.splice(index1, 1); // remove video that has just been played from array
+					
+
+					// show the ratings only after the video has stopped playing
+					document.getElementById("vsrc" + trialNumber).addEventListener("ended", function () {
+						goToRating("samQuestions" + trialNumber);
+						startTime = new Date();
+						trialNumber ++;
+					}, {once: true});
+
+				}				   
+			}
+
+			// function to calculate reaction times, from one selected item to the next
+			function RTCalc(){
+				endTime = new Date();
+				document.getElementById("RT_t" + (trialNumber - 1)).value = endTime - startTime;
+
+			}
+
+
+
+			// prevent users from submitting without having filled out gender and English questions
+			
+			var genderCheck = false;
+			
+			var englishCheck = false;
+			
+			document.querySelector('crowd-form').onsubmit = function(e) {
+				if (document.getElementById("female").checked || document.getElementById("male").checked || document.getElementById("nonbinary").checked || document.getElementById("nosay").checked) {
+					genderCheck = true;
+				}
+				
+				if (document.getElementById("native").checked || document.getElementById("near-native").checked || document.getElementById("fluent").checked || document.getElementById("basic").checked) {
+					englishCheck = true;
+				}
+					
+				if (genderCheck == false || englishCheck == false) {
+				e.preventDefault();
+				alert("Please answer all the questions");
+				}
+			}
+
+		</script>
+
+	</crowd-form>
+</body>
+</html>
