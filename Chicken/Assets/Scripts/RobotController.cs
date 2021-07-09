@@ -41,7 +41,7 @@ public class RobotController : MonoBehaviour {
 		swerveDistance = sharedVariableManager.swerveWidthOfLargestAgent;
 		if (Application.isEditor) {
 			if (debugDoNotSwerve) {
-				swerveDistance = -10.0f;
+				swerveDistance = -20.0f;
 			}
 		}
 	}
