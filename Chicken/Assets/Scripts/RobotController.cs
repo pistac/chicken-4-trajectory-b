@@ -38,7 +38,7 @@ public class RobotController : MonoBehaviour {
 		margin = sharedVariableManager.swerveMargin;
 		sharedVariableManager.robotRadius = radius;
 
-		swerveDistance = 2 * sharedVariableManager.swerveWidthOfLargestAgent;
+		swerveDistance = 10 * sharedVariableManager.swerveWidthOfLargestAgent;
 		if (Application.isEditor) {
 			if (debugDoNotSwerve) {
 				swerveDistance = -10.0f;
